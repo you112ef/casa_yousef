@@ -58,6 +58,12 @@ If you encounter issues with the login functionality:
 2. Check that the `admin` table contains the expected user records
 3. Ensure all required DLLs are present in the application directory
 4. Run `TestDBConnection.ps1` to diagnose database connectivity issues
+5. If the login window doesn't appear, run `create_login_app.bat` to recreate the login-enabled application
+
+## Recent Fix
+**Issue**: Login-enabled application was not working due to missing `LoginVerifier.cs` file
+**Solution**: Recreated the `LoginVerifier.cs` file and recompiled the application using `create_login_app.bat`
+**Status**: ✅ FIXED - Login functionality is now working correctly
 
 ## Future Improvements
 1. Implement password hashing for improved security

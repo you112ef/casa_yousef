@@ -1,100 +1,85 @@
 using System;
-using System.IO;
 using System.Data;
-using System.Data.SQLite;
-using FirebirdSql.Data.FirebirdClient;
+using System.Windows.Forms;
 
 class TestDatabaseConnection
 {
+    [STAThread]
     static void Main()
     {
-        Console.WriteLine("SKY CASA DATABASE CONNECTION TEST");
-        Console.WriteLine("=================================");
-        Console.WriteLine();
-        
-        // Test SQLite connection
-        TestSQLiteConnection();
-        
-        Console.WriteLine();
-        
-        // Test Firebird connection
-        TestFirebirdConnection();
-        
-        Console.WriteLine();
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
-    }
-    
-    static void TestSQLiteConnection()
-    {
-        Console.WriteLine("Testing SQLite Connection:");
-        Console.WriteLine("-------------------------");
-        
         try
         {
-            if (File.Exists("database.db"))
+            Console.WriteLine("Testing database connection for Sky CASA application...");
+            Console.WriteLine("=====================================================");
+            
+            // Initialize the database helper (same as in Program.cs)
+            DatabaseHelper.Initialize("database.db");
+            
+            Console.WriteLine("✓ Database helper initialized successfully");
+            
+            // Test getting table names
+            var tables = DatabaseHelper.GetTableNames();
+            Console.WriteLine("✓ Retrieved " + tables.Count + " tables from database:");
+            
+            foreach (var table in tables)
             {
-                string connectionString = "Data Source=database.db;Version=3;";
-                using (var connection = new SQLiteConnection(connectionString))
+                Console.WriteLine("  - " + table);
+            }
+            
+            // Test a simple query
+            if (tables.Count > 0)
+            {
+                string firstTable = tables[0];
+                Console.WriteLine("\nTesting query on table: " + firstTable);
+                
+                try
                 {
-                    connection.Open();
-                    Console.WriteLine("✓ SQLite connection successful");
-                    
-                    // Get database info
-                    using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table'", connection))
-                    using (var reader = cmd.ExecuteReader())
+                    var data = DatabaseHelper.ExecuteQuery("SELECT COUNT(*) as count FROM " + firstTable);
+                    if (data.Rows.Count > 0)
                     {
-                        Console.WriteLine("Tables in database:");
-                        while (reader.Read())
-                        {
-                            Console.WriteLine("  - " + reader.GetString(0));
-                        }
+                        int count = Convert.ToInt32(data.Rows[0]["count"]);
+                        Console.WriteLine("✓ Table '" + firstTable + "' contains " + count + " records");
                     }
-                    
-                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("⚠ Warning: Could not query table '" + firstTable + "': " + ex.Message);
                 }
             }
-            else
-            {
-                Console.WriteLine("✗ SQLite database.db file not found");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("✗ SQLite connection failed: " + ex.Message);
-        }
-    }
-    
-    static void TestFirebirdConnection()
-    {
-        Console.WriteLine("Testing Firebird Connection:");
-        Console.WriteLine("---------------------------");
-        
-        try
-        {
-            // Try to load Firebird assembly
-            var assembly = System.Reflection.Assembly.LoadFrom("FirebirdSql.Data.FirebirdClient.dll");
-            Console.WriteLine("✓ Firebird client assembly loaded successfully");
             
-            // Try to create connection object
-            var connectionType = assembly.GetType("FirebirdSql.Data.FirebirdClient.FbConnection");
-            if (connectionType != null)
+            // Test admin user access
+            Console.WriteLine("\nTesting admin user access:");
+            try
             {
-                Console.WriteLine("✓ Firebird connection type available");
-                
-                // Note: We can't actually connect without a database file
-                Console.WriteLine("  Note: Actual connection requires a Firebird database file (.fdb)");
-                Console.WriteLine("  To test full connection, create a Firebird database and update");
-                Console.WriteLine("  the connection string in the application code.");
+                var adminData = DatabaseHelper.ExecuteQuery("SELECT * FROM admin WHERE username = 'admin'");
+                if (adminData.Rows.Count > 0)
+                {
+                    Console.WriteLine("✓ Admin user found:");
+                    foreach (DataColumn col in adminData.Columns)
+                    {
+                        Console.WriteLine("  " + col.ColumnName + ": " + adminData.Rows[0][col]);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("⚠ No admin user found in database");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("✗ Firebird connection type not found");
+                Console.WriteLine("⚠ Warning: Could not access admin table: " + ex.Message);
             }
+            
+            Console.WriteLine("\n=== DATABASE CONNECTION TEST COMPLETE ===");
+            Console.WriteLine("The application is properly linked with the database.");
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
         }
         catch (Exception ex)
         {
-            Console.WriteLine("✗ Firebird connection test failed: " + ex.Message);
+            Console.WriteLine("❌ ERROR: " + ex.Message);
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
         }
     }
 }

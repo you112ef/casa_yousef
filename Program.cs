@@ -11,12 +11,18 @@ namespace SkyCASA
         [STAThread]
         static void Main()
         {
-            // Initialize application utilities
-            InitializeApplication();
-            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            
+            // Show login form first
+            LoginForm loginForm = new LoginForm("database.db");
+            if (loginForm.ShowDialog() == DialogResult.OK)
+            {
+                // If login successful, initialize application utilities and show main form
+                InitializeApplication();
+                Application.Run(new MainForm());
+            }
+            // If login cancelled, the application will exit
         }
         
         /// <summary>
