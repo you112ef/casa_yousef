@@ -26,7 +26,7 @@ echo     {
 echo         try
 echo         {
 echo             string dbPath = "database.db";
-echo             string connectionString = $"Data Source={dbPath};Version=3;";
+echo             string connectionString = "Data Source=" + dbPath + ";Version=3;";
 echo.
 echo             using ^(var connection = new SQLiteConnection^(connectionString^)^)
 echo             {
@@ -45,23 +45,22 @@ echo                 {
 echo                     Console.WriteLine^("Creating 'path_vis' table..."^);
 echo.
 echo                     // Create the path_vis table
-echo                     string createTableSQL = @"
-echo                         CREATE TABLE path_vis ^(
-echo                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-echo                             path_id INTEGER,
-echo                             x_coordinate REAL,
-echo                             y_coordinate REAL,
-echo                             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-echo                             visibility_status INTEGER DEFAULT 1,
-echo                             color TEXT,
-echo                             line_width REAL DEFAULT 1.0,
-echo                             FOREIGN KEY ^(path_id^) REFERENCES path^(id^)
-echo                         ^);
-echo.
-echo                         CREATE INDEX idx_path_vis_path_id ON path_vis^(path_id^);
-echo                         CREATE INDEX idx_path_vis_timestamp ON path_vis^(timestamp^);";
+echo                     string createTableSQL = "CREATE TABLE path_vis (id INTEGER PRIMARY KEY AUTOINCREMENT, path_id INTEGER, x_coordinate REAL, y_coordinate REAL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, visibility_status INTEGER DEFAULT 1, color TEXT, line_width REAL DEFAULT 1.0, FOREIGN KEY (path_id) REFERENCES path(id));";
 echo.
 echo                     using ^(var cmd = new SQLiteCommand^(createTableSQL, connection^)^)
+echo                     {
+echo                         cmd.ExecuteNonQuery^(^);
+echo                     }
+echo.
+echo                     // Create indexes
+echo                     string createIndex1SQL = "CREATE INDEX idx_path_vis_path_id ON path_vis(path_id);";
+echo                     using ^(var cmd = new SQLiteCommand^(createIndex1SQL, connection^)^)
+echo                     {
+echo                         cmd.ExecuteNonQuery^(^);
+echo                     }
+echo.
+echo                     string createIndex2SQL = "CREATE INDEX idx_path_vis_timestamp ON path_vis(timestamp);";
+echo                     using ^(var cmd = new SQLiteCommand^(createIndex2SQL, connection^)^)
 echo                     {
 echo                         cmd.ExecuteNonQuery^(^);
 echo                     }
@@ -88,7 +87,7 @@ echo Compiling temporary program...
 csc TempAddTable.cs 2>nul
 if errorlevel 1 (
     echo Error: Failed to compile. Trying with reference...
-    csc TempAddTable.cs -r:"%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\System.Data.dll" 2>nul
+    csc TempAddTable.cs -r:System.Data.SQLite.dll 2>nul
     if errorlevel 1 (
         echo Error: Failed to compile even with reference.
         del TempAddTable.cs >nul 2>nul

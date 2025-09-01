@@ -4,7 +4,7 @@ Write-Host "===================================" -ForegroundColor Green
 Write-Host ""
 
 # Function to update C# files
-function Update-CS-Files {
+function UpdateCSFiles {
     param([string]$FilePath)
     
     Write-Host "Processing C# file: $FilePath" -ForegroundColor Yellow
@@ -13,30 +13,30 @@ function Update-CS-Files {
         $content = Get-Content $FilePath -Raw
         
         # Check if file contains GetSampleData calls
-        if ($content -match 'GetSampleData\s*\(\s*"[^"]+"\s*,\s*\d+\s*\)') {
+        if ($content -match "GetSampleData\s*\(\s*`"[^`"]+`"\s*,\s*\d+\s*\)") {
             Write-Host "  Found GetSampleData calls, updating..." -ForegroundColor Cyan
             
             # Replace GetSampleData with GetAllData and remove the limit parameter
-            $updatedContent = $content -replace 'GetSampleData\s*\(\s*("[^"]+")\s*,\s*\d+\s*\)', 'GetAllData($1)'
+            $updatedContent = $content -replace "GetSampleData\s*\(\s*(`"[^`"]+`")\s*,\s*\d+\s*\)", 'GetAllData($1)'
             
             # Also handle cases where variable is used
-            $updatedContent = $updatedContent -replace 'GetSampleData\s*\(\s*([^,]+)\s*,\s*\d+\s*\)', 'GetAllData($1)'
+            $updatedContent = $updatedContent -replace "GetSampleData\s*\(\s*([^,]+)\s*,\s*\d+\s*\)", 'GetAllData($1)'
             
             # Write updated content back to file
             $updatedContent | Out-File -FilePath $FilePath -Encoding UTF8
-            Write-Host "  ✓ Updated successfully" -ForegroundColor Green
+            Write-Host "  Updated successfully" -ForegroundColor Green
         }
         else {
             Write-Host "  No GetSampleData calls found" -ForegroundColor Gray
         }
     }
     catch {
-        Write-Host "  ✗ Error processing file: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  Error processing file: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
 # Function to update VB files
-function Update-VB-Files {
+function UpdateVBFiles {
     param([string]$FilePath)
     
     Write-Host "Processing VB file: $FilePath" -ForegroundColor Yellow
@@ -45,25 +45,25 @@ function Update-VB-Files {
         $content = Get-Content $FilePath -Raw
         
         # Check if file contains GetSampleData calls
-        if ($content -match 'GetSampleData\s*\(\s*"[^"]+"\s*,\s*\d+\s*\)') {
+        if ($content -match "GetSampleData\s*\(\s*`"[^`"]+`"\s*,\s*\d+\s*\)") {
             Write-Host "  Found GetSampleData calls, updating..." -ForegroundColor Cyan
             
             # Replace GetSampleData with GetAllData and remove the limit parameter
-            $updatedContent = $content -replace 'GetSampleData\s*\(\s*("[^"]+")\s*,\s*\d+\s*\)', 'GetAllData($1)'
+            $updatedContent = $content -replace "GetSampleData\s*\(\s*(`"[^`"]+`")\s*,\s*\d+\s*\)", 'GetAllData($1)'
             
             # Also handle cases where variable is used
-            $updatedContent = $updatedContent -replace 'GetSampleData\s*\(\s*([^,]+)\s*,\s*\d+\s*\)', 'GetAllData($1)'
+            $updatedContent = $updatedContent -replace "GetSampleData\s*\(\s*([^,]+)\s*,\s*\d+\s*\)", 'GetAllData($1)'
             
             # Write updated content back to file
             $updatedContent | Out-File -FilePath $FilePath -Encoding UTF8
-            Write-Host "  ✓ Updated successfully" -ForegroundColor Green
+            Write-Host "  Updated successfully" -ForegroundColor Green
         }
         else {
             Write-Host "  No GetSampleData calls found" -ForegroundColor Gray
         }
     }
     catch {
-        Write-Host "  ✗ Error processing file: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  Error processing file: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
@@ -83,7 +83,7 @@ if ($csFiles.Count -gt 0) {
     Write-Host "Found $($csFiles.Count) C# files to check:" -ForegroundColor Cyan
     foreach ($file in $csFiles) {
         Write-Host "  - $($file.Name)"
-        Update-CS-Files -FilePath $file.FullName
+        UpdateCSFiles -FilePath $file.FullName
     }
 } else {
     Write-Host "No C# UI files found to process" -ForegroundColor Gray
@@ -96,7 +96,7 @@ if ($vbFiles.Count -gt 0) {
     Write-Host "Found $($vbFiles.Count) VB files to check:" -ForegroundColor Cyan
     foreach ($file in $vbFiles) {
         Write-Host "  - $($file.Name)"
-        Update-VB-Files -FilePath $file.FullName
+        UpdateVBFiles -FilePath $file.FullName
     }
 } else {
     Write-Host "No VB UI files found to process" -ForegroundColor Gray

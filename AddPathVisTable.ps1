@@ -36,24 +36,17 @@ try {
         
         # Create the path_vis table
         $createTableCmd = $connection.CreateCommand()
-        $createTableCmd.CommandText = @"
-            CREATE TABLE path_vis (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                path_id INTEGER,
-                x_coordinate REAL,
-                y_coordinate REAL,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                visibility_status INTEGER DEFAULT 1,
-                color TEXT,
-                line_width REAL DEFAULT 1.0,
-                FOREIGN KEY (path_id) REFERENCES path(id)
-            );
-            
-            CREATE INDEX idx_path_vis_path_id ON path_vis(path_id);
-            CREATE INDEX idx_path_vis_timestamp ON path_vis(timestamp);
-"@
-        
+        $createTableCmd.CommandText = "CREATE TABLE path_vis (id INTEGER PRIMARY KEY AUTOINCREMENT, path_id INTEGER, x_coordinate REAL, y_coordinate REAL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, visibility_status INTEGER DEFAULT 1, color TEXT, line_width REAL DEFAULT 1.0, FOREIGN KEY (path_id) REFERENCES path(id));"
         $createTableCmd.ExecuteNonQuery()
+        
+        # Create indexes
+        $createIndex1Cmd = $connection.CreateCommand()
+        $createIndex1Cmd.CommandText = "CREATE INDEX idx_path_vis_path_id ON path_vis(path_id);"
+        $createIndex1Cmd.ExecuteNonQuery()
+        
+        $createIndex2Cmd = $connection.CreateCommand()
+        $createIndex2Cmd.CommandText = "CREATE INDEX idx_path_vis_timestamp ON path_vis(timestamp);"
+        $createIndex2Cmd.ExecuteNonQuery()
         
         Write-Host "Table 'path_vis' created successfully!" -ForegroundColor Green
         Write-Host ""
@@ -63,9 +56,9 @@ try {
         $verifyCmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='path_vis'"
         $reader = $verifyCmd.ExecuteReader()
         if ($reader.HasRows) {
-            Write-Host "✓ Verification successful: 'path_vis' table exists in database" -ForegroundColor Green
+            Write-Host "Verification successful: 'path_vis' table exists in database" -ForegroundColor Green
         } else {
-            Write-Host "✗ Verification failed: 'path_vis' table not found" -ForegroundColor Red
+            Write-Host "Verification failed: 'path_vis' table not found" -ForegroundColor Red
         }
         $reader.Close()
     }
