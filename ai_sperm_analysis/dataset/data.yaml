@@ -1,0 +1,11 @@
+# Dataset configuration for sperm detection
+# Sky CASA - AI Sperm Analysis System
+
+path: ./ai_sperm_analysis/dataset
+train: images/train
+val: images/val
+nc: 1
+names: ['sperm']
+
+# Classes description
+# 0: sperm - الحيوان المنوي
