@@ -1,0 +1,136 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio 2015+ cache/options
+.vs/
+*.vs/
+
+# Visual Studio 2017+ specific
+*[Oo]utput/
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+
+# Visual Studio 6.0 specific
+*.plg
+*.tmp
+*.rsp
+
+# MonoDevelop
+*.pidb
+*.userprefs
+
+# DotCover
+*.dotCover
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
+
+# ReSharper
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JustCode
+*.JustCode
+
+# OpenCover
+*.OpenCover.xml
+
+# Azure Storage Emulator
+*.log
+
+# MSBuild
+*.msbuild.log
+*.msbuild.err
+
+# DotNet Core
+project.lock.json
+*.db
+
+# Visual Studio Code
+.vscode/
+
+# NuGet
+*.nuget.props
+*.nuget.targets
+packages/
+*.nuget/
+
+# Test results
+TestResults/
+UnitTestResults/
+
+# StyleCop
+StyleCopReport.xml
+
+# Backup & temp files
+*.bak
+*.tmp
+*.temp
+*~
+*.log
+*.cache
+*.pidb
+*.userprefs
+*.sdf
+*.userosscache
+*.sln.docstates
+*.orig
+
+# OS generated files
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TeamCity
+_TeamCity*
+
+# NCover
+*.coverage
+*.ncover
+
+# InstallShield
+*.ism
+*.cab
+
+# Windows Azure
+*.cscfg
+*.ccf
+*.csdef
+*.Publish.xml
+
+# Others
+*.cache
+*.pidb
+*.userprefs
+*.sdf
+*.userosscache
+*.sln.docstates
+*.orig

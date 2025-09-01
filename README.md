@@ -35,10 +35,46 @@ Enhanced the DataAccessLayer with a new method that retrieves all records withou
 - `RunVerification.bat` - Batch file to compile and run verification
 - `COMPLETE_CASE_LIMIT_FIX_GUIDE.txt` - Complete guide explaining the fix
 
-## How to Apply the Fix
-1. Run `RunUIUpdate.bat` to automatically update UI code to use `GetAllData()` instead of `GetSampleData()`
-2. Or manually update UI forms by replacing calls to `GetSampleData("table_name", 10)` with `GetAllData("table_name")`
-3. For large datasets, consider implementing pagination for better performance
+## Recent Fix: DataGridView Date Conversion Issue
+This version also includes a fix for an InvalidCastException that occurs when clicking on DataGridView rows:
+
+### Problem
+System.InvalidCastException: التحويل من السلسلة "2025-08-31 00:00:00" إلى النوع 'Date' غير صالح.
+
+### Root Cause
+The application was using direct date conversion methods that fail when:
+1. The input string format doesn't match the system's expected date format
+2. The DataGridView cell contains null or DBNull values
+3. There are regional/cultural settings differences in date parsing
+
+### Solution Implemented
+Enhanced the application with safe date conversion methods:
+
+1. Added `SafeConvertToDate()` method for safe date conversions
+2. Created comprehensive error handling documentation
+3. Provided automated fix scripts
+
+### Files Created
+- `SafeConversionHelper.vb` - Safe conversion functions
+- `DATAGRIDVIEW_DATE_CONVERSION_FIX.txt` - Specific fix instructions
+- `COMPREHENSIVE_ERROR_HANDLING_GUIDE.txt` - General error handling guide
+- `FixDataGridViewDateConversion.ps1` - Automated fix script
+- `FixDataGridViewDateConversion.bat` - Batch file to run the fix script
+- `Rec.cs` - Fixed Rec form implementation
+
+## Documentation
+For comprehensive documentation, please see:
+- [User Manual](docs/user/USER_MANUAL.md)
+- [Developer Guide](docs/developer/DEVELOPER_GUIDE.md)
+- [API Documentation](docs/api/API_DOCUMENTATION.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing Guide](CONTRIBUTING.md)
+
+## How to Apply the Fixes
+1. For case limit fix: Run `RunUIUpdate.bat` to automatically update UI code to use `GetAllData()` instead of `GetSampleData()`
+2. For date conversion fix: Run `FixDataGridViewDateConversion.bat` to automatically apply the date conversion fix
+3. Or manually update UI forms by replacing calls to `GetSampleData("table_name", 10)` with `GetAllData("table_name")`
+4. For large datasets, consider implementing pagination for better performance
 
 ## Database
 The application uses SQLite for local data storage with the following tables:
