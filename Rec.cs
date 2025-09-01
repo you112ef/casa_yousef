@@ -10,10 +10,12 @@ namespace Sky_CASA
         private TextBox txtSearch;
         private Button btnSearch;
         private Button btnRefresh;
+        private PatientService patientService;
         
         public Rec()
         {
             InitializeComponent();
+            patientService = new PatientService();
             LoadData();
         }
         
@@ -36,6 +38,7 @@ namespace Sky_CASA
             
             // Search TextBox
             this.txtSearch.Dock = DockStyle.Top;
+            this.txtSearch.PlaceholderText = "Enter patient name to search...";
             
             // Search Button
             this.btnSearch.Text = "Search";
@@ -48,7 +51,7 @@ namespace Sky_CASA
             this.btnRefresh.Click += new EventHandler(BtnRefresh_Click);
             
             // Form
-            this.Text = "Records";
+            this.Text = "Patient Records";
             this.Size = new System.Drawing.Size(800, 600);
             
             // Add controls
@@ -62,13 +65,16 @@ namespace Sky_CASA
         {
             try
             {
-                var dal = new DataAccessLayer("database.db");
-                var data = dal.GetAllData("cbc"); // Load CBC data as example
+                // Use the patient service to get all patients
+                var data = patientService.GetAllPatients();
                 dataGridView1.DataSource = data;
+                
+                // Update status
+                Logger.LogInfo($"Loaded {data.Rows.Count} patients");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorHandling.HandleException(ex, "Loading Patient Data");
             }
         }
         
@@ -82,7 +88,21 @@ namespace Sky_CASA
                     // Get the selected row
                     DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
                     
-                    // Process each cell in the row
+                    // Get patient ID from the selected row
+                    if (selectedRow.Cells["id"].Value != null)
+                    {
+                        string patientIdString = selectedRow.Cells["id"].Value.ToString();
+                        int patientId = ErrorHandling.SafeConvertToInt(patientIdString, 0);
+                        
+                        if (patientId > 0)
+                        {
+                            Logger.LogInfo($"Selected patient ID: {patientId}");
+                            // You can now use the patientId for further processing
+                            // For example, load detailed patient information or CBC records
+                        }
+                    }
+                    
+                    // Process date columns specifically
                     foreach (DataGridViewCell cell in selectedRow.Cells)
                     {
                         // Handle date columns specifically
@@ -90,7 +110,7 @@ namespace Sky_CASA
                         {
                             // This is likely a date column, use safe conversion
                             string dateString = cell.Value.ToString();
-                            DateTime selectedDate = SafeConvertToDate(dateString, DateTime.Now);
+                            DateTime selectedDate = ErrorHandling.SafeConvertToDateTime(dateString, DateTime.Now);
                             
                             // You can now safely use selectedDate
                             // For example, display it in a text box or use it for further processing
@@ -100,39 +120,38 @@ namespace Sky_CASA
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error processing selection: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        
-        // Safe date conversion method
-        private DateTime SafeConvertToDate(string input, DateTime defaultValue)
-        {
-            // Handle null or empty strings
-            if (string.IsNullOrEmpty(input))
-            {
-                return defaultValue;
-            }
-            
-            // Try to parse the string as a date
-            if (DateTime.TryParse(input.Trim(), out DateTime result))
-            {
-                return result;
-            }
-            else
-            {
-                // Return default value if parsing fails
-                return defaultValue;
+                ErrorHandling.HandleException(ex, "Processing DataGridView Selection");
             }
         }
         
         private void BtnSearch_Click(object sender, EventArgs e)
         {
-            // Implement search functionality
-            MessageBox.Show("Search functionality would be implemented here");
+            try
+            {
+                string searchTerm = txtSearch.Text.Trim();
+                
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    // If search term is empty, load all data
+                    LoadData();
+                    return;
+                }
+                
+                // Use the patient service to search for patients
+                var data = patientService.SearchPatientsByName(searchTerm);
+                dataGridView1.DataSource = data;
+                
+                Logger.LogInfo($"Search completed for term: {searchTerm}, found {data.Rows.Count} results");
+            }
+            catch (Exception ex)
+            {
+                ErrorHandling.HandleException(ex, "Searching Patient Records");
+            }
         }
         
         private void BtnRefresh_Click(object sender, EventArgs e)
         {
+            txtSearch.Clear();
             LoadData();
         }
     }

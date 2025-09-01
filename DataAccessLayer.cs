@@ -14,13 +14,8 @@ public class DataAccessLayer
     
     public DataAccessLayer(string dbPath)
     {
-        // Validate database file exists
-        if (!File.Exists(dbPath))
-        {
-            throw new FileNotFoundException($"Database file not found: {dbPath}");
-        }
-        
-        connectionString = $"Data Source={dbPath};Version=3;";
+        // Use our improved connection fixer
+        connectionString = DatabaseConnectionFix.FixSQLiteConnection(dbPath);
     }
     
     /// <summary>
@@ -314,7 +309,7 @@ public class DataAccessExamples
     {
         try
         {
-            // Create data access layer
+            // Create data access layer with improved connection handling
             var dal = new DataAccessLayer("database.db");
             
             // Get all table names

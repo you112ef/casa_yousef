@@ -9,11 +9,14 @@ public partial class MainForm : Form
     private Button loadAllDataButton;
     private ComboBox tableSelector;
     private Label statusLabel;
+    private Button patientRecordsButton;
+    private PatientService patientService;
 
     public MainForm()
     {
         InitializeComponent();
         dal = new DataAccessLayer("database.db");
+        patientService = new PatientService();
         LoadTableNames();
     }
 
@@ -23,6 +26,7 @@ public partial class MainForm : Form
         this.loadAllDataButton = new Button();
         this.tableSelector = new ComboBox();
         this.statusLabel = new Label();
+        this.patientRecordsButton = new Button();
         
         // Setup DataGridView
         this.dataGridView.Dock = DockStyle.Fill;
@@ -32,6 +36,11 @@ public partial class MainForm : Form
         this.loadAllDataButton.Text = "Load All Data";
         this.loadAllDataButton.Dock = DockStyle.Bottom;
         this.loadAllDataButton.Click += LoadAllDataButton_Click;
+        
+        // Setup Patient Records Button
+        this.patientRecordsButton.Text = "Patient Records";
+        this.patientRecordsButton.Dock = DockStyle.Bottom;
+        this.patientRecordsButton.Click += PatientRecordsButton_Click;
         
         // Setup ComboBox
         this.tableSelector.Dock = DockStyle.Top;
@@ -49,6 +58,7 @@ public partial class MainForm : Form
         // Add controls to form
         this.Controls.Add(this.dataGridView);
         this.Controls.Add(this.loadAllDataButton);
+        this.Controls.Add(this.patientRecordsButton);
         this.Controls.Add(this.statusLabel);
         this.Controls.Add(this.tableSelector);
     }
@@ -71,10 +81,13 @@ public partial class MainForm : Form
             {
                 tableSelector.SelectedIndex = 0;
             }
+            
+            Logger.LogInfo($"Loaded {tables.Count} table names");
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading table names: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Logger.LogException(ex, "MainForm.LoadTableNames");
+            ErrorHandling.HandleException(ex, "Loading Table Names");
         }
     }
 
@@ -96,11 +109,31 @@ public partial class MainForm : Form
             
             dataGridView.DataSource = allData;
             statusLabel.Text = $"Loaded {allData.Rows.Count} records from {selectedTable}";
+            
+            Logger.LogInfo($"Loaded {allData.Rows.Count} records from table {selectedTable}");
         }
         catch (Exception ex)
         {
             statusLabel.Text = "Error loading data";
-            MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Logger.LogException(ex, "MainForm.LoadAllDataButton_Click");
+            ErrorHandling.HandleException(ex, "Loading Data");
+        }
+    }
+    
+    private void PatientRecordsButton_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            // Open the patient records form
+            Rec patientRecordsForm = new Rec();
+            patientRecordsForm.Show();
+            
+            Logger.LogInfo("Opened patient records form");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException(ex, "MainForm.PatientRecordsButton_Click");
+            ErrorHandling.HandleException(ex, "Opening Patient Records");
         }
     }
 }
