@@ -1,0 +1,120 @@
+CBC ANALYSIS TYPE SPECIFICATION FOR SKY CASA
+==========================================
+
+1. ANALYSIS TYPE OVERVIEW
+------------------------
+Analysis Name: Complete Blood Count (CBC)
+Description: A common blood test used to evaluate overall health and detect a wide range of disorders including anemia, infection, and leukemia.
+Category: Hematology
+Test Method: Automated Analyzer
+Units: Cells/μL (for cell counts), % (for percentages), g/dL (for hemoglobin), % (for hematocrit)
+
+2. REQUIRED INPUT FIELDS
+-----------------------
+- Patient ID
+- Sample ID
+- Test Date
+- White Blood Cell Count (WBC)
+- Red Blood Cell Count (RBC)
+- Hemoglobin (HGB)
+- Hematocrit (HCT)
+- Mean Corpuscular Volume (MCV)
+- Mean Corpuscular Hemoglobin (MCH)
+- Mean Corpuscular Hemoglobin Concentration (MCHC)
+- Red Cell Distribution Width (RDW)
+- Platelet Count (PLT)
+- Mean Platelet Volume (MPV)
+- Platelet Distribution Width (PDW)
+- Neutrophils (%)
+- Lymphocytes (%)
+- Monocytes (%)
+- Eosinophils (%)
+- Basophils (%)
+- Bands (%)
+- Atypical Lymphocytes (%)
+- Nucleated Red Blood Cells (NRBC)
+- Absolute Neutrophil Count (ANC)
+- Absolute Lymphocyte Count (ALC)
+- Absolute Monocyte Count (AMC)
+- Absolute Eosinophil Count (AEC)
+- Absolute Basophil Count (ABC)
+- Absolute Band Count (ABC)
+- Technician ID
+
+3. RESULT FORMAT AND UNITS
+-------------------------
+- WBC: Cells x 10^9/L
+- RBC: Cells x 10^12/L
+- HGB: g/dL
+- HCT: %
+- MCV: fL
+- MCH: pg
+- MCHC: g/dL
+- RDW: %
+- PLT: Cells x 10^9/L
+- MPV: fL
+- PDW: fL
+- Differential counts: % and absolute counts (Cells x 10^9/L)
+
+4. NORMAL RANGE VALUES
+---------------------
+- WBC: 4.0-11.0 x 10^9/L
+- RBC: 4.2-5.9 x 10^12/L (Male), 3.8-5.2 x 10^12/L (Female)
+- HGB: 13.5-17.5 g/dL (Male), 12.0-15.5 g/dL (Female)
+- HCT: 38.3-48.6% (Male), 35.5-44.9% (Female)
+- MCV: 80-100 fL
+- MCH: 27-33 pg
+- MCHC: 32-36 g/dL
+- RDW: 11.5-14.5%
+- PLT: 150-450 x 10^9/L
+- MPV: 7.5-11.5 fL
+- Neutrophils: 40-75%
+- Lymphocytes: 20-40%
+- Monocytes: 2-10%
+- Eosinophils: 0-6%
+- Basophils: 0-2%
+- Bands: 0-3%
+
+5. INTERPRETATION GUIDELINES
+---------------------------
+- WBC:
+  * < 4.0 x 10^9/L: Leukopenia
+  * > 11.0 x 10^9/L: Leukocytosis
+- RBC:
+  * Low: Anemia
+  * High: Polycythemia
+- HGB:
+  * Low: Anemia
+  * High: Polycythemia
+- HCT:
+  * Low: Anemia
+  * High: Dehydration or Polycythemia
+- MCV:
+  * < 80 fL: Microcytic anemia
+  * 80-100 fL: Normocytic anemia
+  * > 100 fL: Macrocytic anemia
+- PLT:
+  * < 150 x 10^9/L: Thrombocytopenia
+  * > 450 x 10^9/L: Thrombocytosis
+- Differential Abnormalities:
+  * Neutrophilia: > 75%
+  * Neutropenia: < 40%
+  * Lymphocytosis: > 40%
+  * Lymphopenia: < 20%
+  * Monocytosis: > 10%
+  * Eosinophilia: > 6%
+  * Basophilia: > 2%
+
+6. REQUIRED EQUIPMENT OR REAGENTS
+--------------------------------
+- Automated Hematology Analyzer
+- EDTA tubes for blood collection
+- Quality control materials
+- Calibration standards
+
+7. CRITICAL VALUES
+-----------------
+- WBC < 1.0 x 10^9/L or > 50.0 x 10^9/L
+- HGB < 5.0 g/dL or > 20.0 g/dL
+- PLT < 20 x 10^9/L or > 1000 x 10^9/L
+- Any life-threatening abnormality should trigger immediate notification

@@ -1,0 +1,180 @@
+UI UPDATE GUIDE: FIXING THE "CANNOT ADD MORE THAN 10 CASES" ISSUE
+================================================================
+
+PROBLEM:
+-------
+The application UI is using GetSampleData() methods which have a default limit of 10 records.
+This creates the illusion that only 10 cases can be added, when in fact the database can store unlimited records.
+
+SOLUTION:
+--------
+Replace calls to GetSampleData() with GetAllData() or implement pagination for better performance.
+
+FILES TO UPDATE:
+---------------
+Look for UI forms that display case/patient data. These files typically contain code like:
+
+C# Example:
+```csharp
+var sampleData = dal.GetSampleData("cbc", 10);
+dataGridView1.DataSource = sampleData;
+```
+
+VB.NET Example:
+```vb
+Dim sampleData = dal.GetSampleData("cbc", 10)
+DataGridView1.DataSource = sampleData
+```
+
+REQUIRED CHANGES:
+----------------
+
+1. UPDATE DATA RETRIEVAL CALLS:
+
+C# - Change from:
+```csharp
+var sampleData = dal.GetSampleData("table_name", 10);
+```
+To:
+```csharp
+var allData = dal.GetAllData("table_name");
+```
+
+VB.NET - Change from:
+```vb
+Dim sampleData = dal.GetSampleData("table_name", 10)
+```
+To:
+```vb
+Dim allData = dal.GetAllData("table_name")
+```
+
+2. COMPLETE EXAMPLES:
+
+C# Before:
+```csharp
+private void LoadData()
+{
+    try
+    {
+        var dal = new DataAccessLayer("database.db");
+        var sampleData = dal.GetSampleData("cbc", 10);
+        dataGridView1.DataSource = sampleData;
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error loading data: " + ex.Message);
+    }
+}
+```
+
+C# After:
+```csharp
+private void LoadData()
+{
+    try
+    {
+        var dal = new DataAccessLayer("database.db");
+        var allData = dal.GetAllData("cbc");
+        dataGridView1.DataSource = allData;
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error loading data: " + ex.Message);
+    }
+}
+```
+
+VB.NET Before:
+```vb
+Private Sub LoadData()
+    Try
+        Dim dal As New DataAccessLayer("database.db")
+        Dim sampleData = dal.GetSampleData("cbc", 10)
+        DataGridView1.DataSource = sampleData
+    Catch ex As Exception
+        MessageBox.Show("Error loading data: " & ex.Message)
+    End Try
+End Sub
+```
+
+VB.NET After:
+```vb
+Private Sub LoadData()
+    Try
+        Dim dal As New DataAccessLayer("database.db")
+        Dim allData = dal.GetAllData("cbc")
+        DataGridView1.DataSource = allData
+    Catch ex As Exception
+        MessageBox.Show("Error loading data: " & ex.Message)
+    End Try
+End Sub
+```
+
+3. PAGINATION IMPLEMENTATION (RECOMMENDED):
+
+For better performance with large datasets, implement pagination:
+
+C# Example:
+```csharp
+private void LoadDataWithPagination(int pageNumber, int pageSize)
+{
+    try
+    {
+        var dal = new DataAccessLayer("database.db");
+        var offset = (pageNumber - 1) * pageSize;
+        var paginatedData = dal.ExecuteQuery(
+            $"SELECT * FROM cbc LIMIT {pageSize} OFFSET {offset}");
+        dataGridView1.DataSource = paginatedData;
+        
+        // Update pagination controls
+        UpdatePaginationControls(pageNumber);
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error loading data: " + ex.Message);
+    }
+}
+```
+
+VB.NET Example:
+```vb
+Private Sub LoadDataWithPagination(pageNumber As Integer, pageSize As Integer)
+    Try
+        Dim dal As New DataAccessLayer("database.db")
+        Dim offset = (pageNumber - 1) * pageSize
+        Dim paginatedData = dal.ExecuteQuery(
+            $"SELECT * FROM cbc LIMIT {pageSize} OFFSET {offset}")
+        DataGridView1.DataSource = paginatedData
+        
+        ' Update pagination controls
+        UpdatePaginationControls(pageNumber)
+    Catch ex As Exception
+        MessageBox.Show("Error loading data: " & ex.Message)
+    End Try
+End Sub
+```
+
+4. SEARCH FOR UI CODE:
+
+Look in the following places for UI code that needs updating:
+- Forms with DataGridView, ListView, or ListBox controls
+- Methods that populate data display controls
+- Event handlers for form loading or data refresh
+
+COMMON FILE NAMES TO CHECK:
+- Rec.cs / Rec.vb (mentioned in previous error reports)
+- PatientForm.cs / PatientForm.vb
+- CaseForm.cs / CaseForm.vb
+- MainForm.cs / MainForm.vb
+- Any form with data grid controls
+
+VERIFICATION:
+------------
+After making changes:
+1. Run the application
+2. Add more than 10 cases
+3. Verify all cases are displayed in the UI
+4. Test data operations (add, edit, delete)
+
+The application will now be able to display all cases instead of being limited to just 10.

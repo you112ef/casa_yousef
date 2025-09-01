@@ -1,0 +1,169 @@
+DATABASE SCHEMA DESIGN FOR CBC ANALYSIS TYPE
+==========================================
+
+1. ASSUMED EXISTING TABLES
+------------------------
+Based on the framework, we assume the following tables exist:
+- Patients (PatientID, Name, DOB, Gender, etc.)
+- Technicians (TechnicianID, Name, etc.)
+
+2. NEW TABLES AND MODIFICATIONS
+-----------------------------
+
+TABLE: AnalysisTypes
+-------------------
+If this table doesn't exist, we need to create it:
+CREATE TABLE AnalysisTypes (
+    AnalysisTypeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    AnalysisName VARCHAR(100) NOT NULL,
+    Description TEXT,
+    Category VARCHAR(50),
+    NormalRangeMin DECIMAL(10,2),
+    NormalRangeMax DECIMAL(10,2),
+    Units VARCHAR(20),
+    TestMethod VARCHAR(100)
+);
+
+Insert the CBC analysis type:
+INSERT INTO AnalysisTypes 
+(AnalysisName, Description, Category, Units, TestMethod)
+VALUES 
+('Complete Blood Count', 'Full blood panel analysis', 'Hematology', 'Cells/μL', 'Automated Analyzer');
+
+TABLE: CBCTestResults
+--------------------
+This table will store the specific results for CBC tests:
+
+CREATE TABLE CBCTestResults (
+    TestResultID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PatientID INTEGER NOT NULL,
+    AnalysisTypeID INTEGER NOT NULL,
+    TechnicianID INTEGER,
+    TestDate DATETIME NOT NULL,
+    
+    -- Basic CBC values
+    WBC DECIMAL(10,2),
+    RBC DECIMAL(10,2),
+    Hemoglobin DECIMAL(10,2),
+    Hematocrit DECIMAL(10,2),
+    MCV DECIMAL(10,2),
+    MCH DECIMAL(10,2),
+    MCHC DECIMAL(10,2),
+    RDW DECIMAL(10,2),
+    PlateletCount DECIMAL(10,2),
+    MPV DECIMAL(10,2),
+    PDW DECIMAL(10,2),
+    
+    -- Differential percentages
+    NeutrophilsPercent DECIMAL(5,2),
+    LymphocytesPercent DECIMAL(5,2),
+    MonocytesPercent DECIMAL(5,2),
+    EosinophilsPercent DECIMAL(5,2),
+    BasophilsPercent DECIMAL(5,2),
+    BandsPercent DECIMAL(5,2),
+    AtypicalLymphocytesPercent DECIMAL(5,2),
+    NRBC DECIMAL(10,2),
+    
+    -- Absolute counts
+    NeutrophilsAbsolute DECIMAL(10,2),
+    LymphocytesAbsolute DECIMAL(10,2),
+    MonocytesAbsolute DECIMAL(10,2),
+    EosinophilsAbsolute DECIMAL(10,2),
+    BasophilsAbsolute DECIMAL(10,2),
+    BandsAbsolute DECIMAL(10,2),
+    
+    -- Interpretation and flags
+    WBCInterpretation VARCHAR(50),
+    RBCInterpretation VARCHAR(50),
+    HGBInterpretation VARCHAR(50),
+    PLTInterpretation VARCHAR(50),
+    DifferentialInterpretation TEXT,
+    CriticalValueFlag BOOLEAN DEFAULT FALSE,
+    Comments TEXT,
+    
+    -- Quality control
+    QCStatus VARCHAR(20) DEFAULT 'PENDING',
+    ReviewedBy INTEGER,
+    ReviewDate DATETIME,
+    
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (AnalysisTypeID) REFERENCES AnalysisTypes(AnalysisTypeID),
+    FOREIGN KEY (TechnicianID) REFERENCES Technicians(TechnicianID),
+    FOREIGN KEY (ReviewedBy) REFERENCES Technicians(TechnicianID)
+);
+
+TABLE: CBC_NormalRanges
+---------------------
+This table will store normal ranges for different demographics:
+
+CREATE TABLE CBC_NormalRanges (
+    RangeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ParameterName VARCHAR(50) NOT NULL,
+    Gender VARCHAR(10), -- 'Male', 'Female', 'Both'
+    AgeMin INTEGER, -- Minimum age in years
+    AgeMax INTEGER, -- Maximum age in years
+    NormalMin DECIMAL(10,2),
+    NormalMax DECIMAL(10,2),
+    Units VARCHAR(20),
+    Comments TEXT
+);
+
+Sample normal ranges data:
+INSERT INTO CBC_NormalRanges (ParameterName, Gender, AgeMin, AgeMax, NormalMin, NormalMax, Units) VALUES
+('WBC', 'Both', 18, 999, 4.0, 11.0, 'x10^9/L'),
+('RBC', 'Male', 18, 999, 4.2, 5.9, 'x10^12/L'),
+('RBC', 'Female', 18, 999, 3.8, 5.2, 'x10^12/L'),
+('Hemoglobin', 'Male', 18, 999, 13.5, 17.5, 'g/dL'),
+('Hemoglobin', 'Female', 18, 999, 12.0, 15.5, 'g/dL'),
+('Hematocrit', 'Male', 18, 999, 38.3, 48.6, '%'),
+('Hematocrit', 'Female', 18, 999, 35.5, 44.9, '%'),
+('MCV', 'Both', 18, 999, 80.0, 100.0, 'fL'),
+('PlateletCount', 'Both', 18, 999, 150.0, 450.0, 'x10^9/L');
+
+3. INDEXES FOR PERFORMANCE
+------------------------
+CREATE INDEX idx_cbc_patient_date ON CBCTestResults(PatientID, TestDate);
+CREATE INDEX idx_cbc_test_date ON CBCTestResults(TestDate);
+CREATE INDEX idx_cbc_critical ON CBCTestResults(CriticalValueFlag);
+CREATE INDEX idx_normal_ranges_param ON CBC_NormalRanges(ParameterName);
+
+4. VIEWS FOR REPORTING
+--------------------
+CREATE VIEW v_CBCTestResults AS
+SELECT 
+    c.TestResultID,
+    p.PatientID,
+    p.Name AS PatientName,
+    c.TestDate,
+    c.WBC,
+    c.RBC,
+    c.Hemoglobin,
+    c.Hematocrit,
+    c.PlateletCount,
+    c.NeutrophilsPercent,
+    c.LymphocytesPercent,
+    c.MonocytesPercent,
+    c.EosinophilsPercent,
+    c.BasophilsPercent,
+    c.CriticalValueFlag,
+    c.Comments,
+    t.Name AS TechnicianName
+FROM CBCTestResults c
+JOIN Patients p ON c.PatientID = p.PatientID
+LEFT JOIN Technicians t ON c.TechnicianID = t.TechnicianID;
+
+5. TRIGGERS FOR DATA INTEGRITY
+----------------------------
+CREATE TRIGGER tr_check_critical_values
+AFTER INSERT ON CBCTestResults
+FOR EACH ROW
+BEGIN
+    UPDATE CBCTestResults 
+    SET CriticalValueFlag = 1
+    WHERE TestResultID = NEW.TestResultID
+    AND (
+        NEW.WBC < 1.0 OR NEW.WBC > 50.0 OR
+        NEW.Hemoglobin < 5.0 OR NEW.Hemoglobin > 20.0 OR
+        NEW.PlateletCount < 20 OR NEW.PlateletCount > 1000
+    );
+END;

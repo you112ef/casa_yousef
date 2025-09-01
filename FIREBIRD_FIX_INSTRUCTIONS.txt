@@ -1,0 +1,54 @@
+FIREBIRD SQL CLIENT MISSING ASSEMBLY FIX
+=====================================
+
+ERROR IDENTIFIED:
+---------------
+System.IO.FileNotFoundException: Could not load file or assembly 'FirebirdSql.Data.FirebirdClient, Version=10.3.1.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c' or one of its dependencies.
+
+This indicates your application also uses Firebird SQL database in addition to SQLite.
+
+SOLUTION:
+--------
+
+1. DOWNLOAD FIREBIRD SQL CLIENT:
+   - Visit: https://github.com/FirebirdSQL/NETProvider/releases
+   - Download the appropriate version (10.3.1.0) or the latest compatible version
+   - Or install via NuGet: Install-Package FirebirdSql.Data.FirebirdClient -Version 10.3.1.0
+
+2. PLACE THE DLL IN YOUR APPLICATION DIRECTORY:
+   - Copy FirebirdSql.Data.FirebirdClient.dll to:
+     D:\New folder (4)\Sky CASA\
+
+3. ALTERNATIVE: UPDATE APP.CONFIG FOR ASSEMBLY BINDING:
+   Add the following to your Sky_CASA.exe.config file within the <runtime> section:
+
+   <dependentAssembly>
+     <assemblyIdentity name="FirebirdSql.Data.FirebirdClient" 
+                       publicKeyToken="3750abcc3150b00c" 
+                       culture="neutral" />
+     <bindingRedirect oldVersion="0.0.0.0-10.3.1.0" 
+                      newVersion="10.3.1.0" />
+   </dependentAssembly>
+
+4. IF YOU DON'T USE FIREBIRD:
+   - Check your application code for Firebird references
+   - Remove or comment out any Firebird-specific code
+   - Or replace with SQLite equivalents
+
+FILES IN YOUR CURRENT DIRECTORY:
+-------------------------------
+- AForge.dll
+- AForge.Video.dll
+- AForge.Video.DirectShow.dll
+- database.db (SQLite database)
+- Sky_CASA.exe
+- Sky_CASA.exe.config
+
+RECOMMENDED IMMEDIATE ACTION:
+----------------------------
+1. Download FirebirdSql.Data.FirebirdClient.dll
+2. Place it in your application directory
+3. Test the application again
+
+You can download it from:
+https://www.nuget.org/packages/FirebirdSql.Data.FirebirdClient/10.3.1

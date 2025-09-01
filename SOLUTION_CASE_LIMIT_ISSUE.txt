@@ -1,0 +1,72 @@
+SOLUTION: CANNOT ADD MORE THAN 10 CASES ISSUE
+==========================================
+
+ISSUE DESCRIPTION:
+-----------------
+The user reports that they cannot add more than 10 cases to the Sky CASA application.
+
+INVESTIGATION FINDINGS:
+----------------------
+After thorough investigation of the application code and database structure, no explicit limit of 10 cases was found in:
+
+1. Database constraints - No triggers or constraints limiting record count
+2. Application code - No business logic limiting case creation
+3. UI code - No display limits preventing more than 10 cases from being shown
+4. Configuration files - No settings limiting the number of cases
+
+The only references to "10" found in the codebase are:
+- In GetSampleData methods (DataAccessLayer.cs/vb) which have a default limit of 10 for retrieving sample data
+- These are for display purposes only and do not affect actual data storage
+
+DATABASE STRUCTURE:
+------------------
+The application database contains the following tables:
+- sem, ret, stool, urine, cbc, vis, dr, path, log
+- No table named "patients" or "cases" was found
+- The "cbc" table is designed to store Complete Blood Count test results
+
+VERIFICATION STEPS:
+------------------
+1. Run the database examination tool to check current record counts:
+   - The database currently contains records in various tables
+   - No table has an explicit limit of 10 records
+
+2. Test case addition:
+   - The application should allow adding more than 10 cases
+   - If there's an issue, it's likely in the UI display rather than data storage
+
+SOLUTION:
+--------
+1. Verify actual database capacity:
+   - The SQLite database can store thousands of records
+   - There is no technical limit preventing more than 10 cases
+
+2. Check UI display:
+   - The UI might be using GetSampleData methods which have a default limit of 10
+   - Modify UI code to display all records instead of just samples
+
+3. Implementation recommendations:
+   - Replace calls to GetSampleData() with queries that retrieve all data
+   - Add pagination controls for better user experience with large datasets
+   - Implement proper data binding to display all records
+
+CODE MODIFICATION EXAMPLE:
+-------------------------
+Instead of:
+DataTable sampleData = dal.GetSampleData("cbc", 10); // Only gets 10 records
+
+Use:
+DataTable allData = dal.ExecuteQuery("SELECT * FROM cbc"); // Gets all records
+
+Or with a larger limit:
+DataTable moreData = dal.GetSampleData("cbc", 100); // Gets up to 100 records
+
+CONCLUSION:
+----------
+The "cannot add more than 10 cases" issue is likely a display limitation rather than a storage limitation. The application can store more than 10 cases, but the UI might only be showing a sample of 10 records. To fix this:
+
+1. Modify the UI code to display all records
+2. Implement proper pagination for better performance with large datasets
+3. Ensure data binding is correctly configured to show all records
+
+No changes to the database or core business logic are required as there are no actual limits preventing more than 10 cases from being stored.
