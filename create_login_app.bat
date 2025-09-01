@@ -70,8 +70,7 @@ echo SUCCESS: Application with login created!
 echo Run Sky_CASA_With_Login.exe to start the application with login verification.
 echo.
 
-REM Clean up temporary files
-del LoginVerifier.cs
+REM Clean up temporary files (keep LoginVerifier.cs for Git)
 del SkyCASALauncher.cs
 del LoginVerifier.dll
 
