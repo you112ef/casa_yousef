@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Login functionality with authentication against database
 - Comprehensive documentation structure
 - Developer guide
 - User manual
@@ -23,9 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Case limit issue by implementing GetAllData method
 - UI display limitations
+- Assembly loading issue in login-enabled application
 
 ### Security
 - Updated dependencies
+- Added authentication layer to application
 
 ## [1.2.0] - 2025-09-01
 
