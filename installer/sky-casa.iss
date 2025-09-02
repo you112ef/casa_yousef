@@ -37,6 +37,9 @@ Source: "{#BuildDir}\\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; AI analysis scripts (if present in repo next to build dir)
 Source: "ai_sperm_analysis\\*"; DestDir: "{app}\\ai_sperm_analysis"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+; OFFLINE ONNX shim + models
+Source: "ai_sperm_onnx\\python.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "ai_sperm_onnx\\models\\*"; DestDir: "{app}\\ai_sperm_onnx\\models"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 ; Config and database if present
 Source: "database.db"; DestDir: "{app}"; Flags: onlyifdoesntexist ignoreversion skipifsourcedoesntexist
 Source: "Sky_CASA.exe.config"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
