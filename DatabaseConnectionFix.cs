@@ -297,13 +297,8 @@ CREATE TABLE IF NOT EXISTS semen_analysis (
                     cmd.ExecuteNonQuery();
                 }
 
-                cmd.CommandText = "SELECT COUNT(*) FROM patients";
-                var pCount = Convert.ToInt32(cmd.ExecuteScalar());
-                if (pCount == 0)
-                {
-                    cmd.CommandText = "INSERT INTO patients (name, birth_date, gender, phone_number, address) VALUES ('Demo Patient','1990-01-01','ذكر','01000000000','')";
-                    cmd.ExecuteNonQuery();
-                }
+                // Do not seed demo patients in production builds; keep database clean on first run
+                // Patients table will be populated by real user data during normal use
 
                 tx.Commit();
             }
