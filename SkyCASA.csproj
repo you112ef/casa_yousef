@@ -57,6 +57,10 @@
     <Compile Include="SettingsForm.cs" />
     <Compile Include="SpermAnalysisForm.cs" />
     <Compile Include="WHOReportForm.cs" />
+    <Compile Include="CBC_BusinessLogic.cs" />
+    <Compile Include="CBCForm.cs" />
+    <Compile Include="ESRForm.cs" />
+    <Compile Include="HbA1cForm.cs" />
   </ItemGroup>
 
   <ItemGroup>
