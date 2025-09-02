@@ -1,7 +1,3 @@
-n## ONNX AI (no Python)
-- Bundled python.exe shim runs ONNX model (yolov5s.onnx) offline.
-- SpermAnalysisForm continues to call python; the shim handles it.
-
 # Sky CASA - Medical Laboratory Analysis System
 
 ## Overview
