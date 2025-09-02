@@ -120,8 +120,8 @@ namespace SkyCASA
             analysisMenu.DropDownItems.Add(CreateMenuItem("💧 تحليل البول | Urine Analysis", "urine", Color.Gold));
             analysisMenu.DropDownItems.Add(CreateMenuItem("🦠 تحليل البراز | Stool Analysis", "stool", Color.SaddleBrown));
             analysisMenu.DropDownItems.Add(new ToolStripSeparator());
-            analysisMenu.DropDownItems.Add(CreateMenuItem("🫘 وظائف الكلى | Kidney Function", "kidney", Color.DarkBlue));
-            analysisMenu.DropDownItems.Add(CreateMenuItem("🫀 وظائف الكبد | Liver Function", "liver", Color.DarkGreen));
+            analysisMenu.DropDownItems.Add(CreateMenuItem("🧪 معدل الترسيب ESR | ESR Test", "esr", Color.Crimson));
+            analysisMenu.DropDownItems.Add(CreateMenuItem("🧬 HbA1c (السكر التراكمي)", "hba1c", Color.Teal));
             analysisMenu.DropDownItems.Add(new ToolStripSeparator());
             analysisMenu.DropDownItems.Add(CreateMenuItem("🧬 تحليل الحيوانات المنوية بالذكاء الاصطناعي | AI Sperm Analysis", "sperm_ai", Color.Purple));
             
@@ -165,8 +165,8 @@ namespace SkyCASA
             var cbcBtn = CreateToolButton("🩸 فحص دم", "cbc", AccentRed);
             var urineBtn = CreateToolButton("💧 بول", "urine", Color.Gold);
             var stoolBtn = CreateToolButton("🦠 براز", "stool", Color.SaddleBrown);
-            var kidneyBtn = CreateToolButton("🫘 كلى", "kidney", Color.DarkBlue);
-            var liverBtn = CreateToolButton("🫀 كبد", "liver", Color.DarkGreen);
+            var esrBtn = CreateToolButton("🧪 ESR", "esr", Color.Crimson);
+            var hba1cBtn = CreateToolButton("🧬 HbA1c", "hba1c", Color.Teal);
             var spermBtn = CreateToolButton("🧬 AI حيوانات منوية", "sperm_ai", Color.Purple);
             var dashboardBtn = CreateToolButton("📊 لوحة التحكم", "dashboard", SecondaryBlue);
             
@@ -175,7 +175,7 @@ namespace SkyCASA
                 new ToolStripSeparator(),
                 cbcBtn, urineBtn, stoolBtn,
                 new ToolStripSeparator(),
-                kidneyBtn, liverBtn,
+                esrBtn, hba1cBtn,
                 new ToolStripSeparator(),
                 spermBtn,
                 new ToolStripSeparator(),
@@ -256,8 +256,8 @@ namespace SkyCASA
             CreateStatCard("🩸 فحوصات الدم | Blood Tests", "0", AccentRed, 1, 0);
             CreateStatCard("💧 تحاليل البول | Urine Tests", "0", Color.Gold, 2, 0);
             CreateStatCard("🧬 تحاليل AI | AI Analysis", "0", Color.Purple, 3, 0);
-            CreateStatCard("🫘 وظائف الكلى | Kidney Tests", "0", Color.DarkBlue, 0, 1);
-            CreateStatCard("🫀 وظائف الكبد | Liver Tests", "0", Color.DarkGreen, 1, 1);
+            CreateStatCard("🧪 ESR | ESR Tests", "0", Color.Crimson, 0, 1);
+            CreateStatCard("🧬 HbA1c | HbA1c Tests", "0", Color.Teal, 1, 1);
             CreateStatCard("🦠 تحاليل البراز | Stool Tests", "0", Color.SaddleBrown, 2, 1);
             CreateStatCard("📊 إجمالي التحاليل | Total Tests", "0", SecondaryBlue, 3, 1);
             
@@ -462,9 +462,9 @@ namespace SkyCASA
             
             // Blood tests group
             CreateAnalysisGroup("فحوصات الدم | Blood Tests", 
-                new[] { "🩸 فحص الدم الشامل CBC", "🫘 وظائف الكلى", "🫀 وظائف الكبد" },
-                new[] { "cbc", "kidney", "liver" },
-                new[] { AccentRed, Color.DarkBlue, Color.DarkGreen },
+                new[] { "🩸 فحص الدم الشامل CBC", "🧪 معدل الترسيب ESR", "🧬 HbA1c (السكر التراكمي)" },
+                new[] { "cbc", "esr", "hba1c" },
+                new[] { AccentRed, Color.Crimson, Color.Teal },
                 analysisContainer, 0, 0);
             
             // Fluid tests group
@@ -565,7 +565,7 @@ namespace SkyCASA
                         OpenPatientForm();
                         break;
                     case "cbc":
-                        OpenAnalysisForm("CBC");
+                        OpenCBCForm();
                         break;
                     case "urine":
                         OpenAnalysisForm("Urine");
@@ -573,11 +573,11 @@ namespace SkyCASA
                     case "stool":
                         OpenAnalysisForm("Stool");
                         break;
-                    case "kidney":
-                        OpenAnalysisForm("Kidney");
+                    case "esr":
+                        OpenESRForm();
                         break;
-                    case "liver":
-                        OpenAnalysisForm("Liver");
+                    case "hba1c":
+                        OpenHbA1cForm();
                         break;
                     case "sperm_ai":
                         OpenSpermAnalysisForm();
@@ -622,9 +622,29 @@ namespace SkyCASA
         
         private void OpenAnalysisForm(string analysisType)
         {
-            // TODO: Create specific analysis forms for each type
             MessageBox.Show($"فتح نموذج تحليل {analysisType}\nOpening {analysisType} analysis form", 
                            "قيد التطوير", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OpenCBCForm()
+        {
+            var form = new CBCForm();
+            form.Show();
+            Logger.LogInfo("Opened CBC form");
+        }
+
+        private void OpenESRForm()
+        {
+            var form = new ESRForm();
+            form.Show();
+            Logger.LogInfo("Opened ESR form");
+        }
+
+        private void OpenHbA1cForm()
+        {
+            var form = new HbA1cForm();
+            form.Show();
+            Logger.LogInfo("Opened HbA1c form");
         }
         
         private void OpenSpermAnalysisForm()
@@ -675,8 +695,8 @@ namespace SkyCASA
             textBox.Text += $"   • CBC Tests: {GetTestCount("cbc")}\n";
             textBox.Text += $"   • Urine Tests: {GetTestCount("urine")}\n";
             textBox.Text += $"   • Stool Tests: {GetTestCount("stool")}\n";
-            textBox.Text += $"   • Kidney Tests: {GetTestCount("kidney_function")}\n";
-            textBox.Text += $"   • Liver Tests: {GetTestCount("liver_function")}\n";
+            textBox.Text += $"   • ESR Tests: {GetTestCount("esr")}\n";
+            textBox.Text += $"   • HbA1c Tests: {GetTestCount("hba1c")}\n";
             textBox.Text += $"   • AI Sperm Tests: {GetTestCount("semen_analysis")}\n\n";
             textBox.Text += "🎉 All systems operational!";
             
@@ -694,8 +714,7 @@ namespace SkyCASA
 
 ✨ الميزات الجديدة:
 • 🧬 تحليل الحيوانات المنوية بالذكاء الاصطناعي (YOLOv8 + DeepSORT)
-• 🫘 تحاليل وظائف الكلى الشاملة
-• 🫀 تحاليل وظائف الكبد المتقدمة
+• 🩸 فحوصات الدم: CBC، ESR، HbA1c
 • 📊 تقارير WHO المطابقة للمعايير العالمية
 • 🎨 واجهة محسنة بألوان احترافية
 
