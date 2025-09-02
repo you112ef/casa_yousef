@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Sky_CASA</AssemblyName>
     <RootNamespace>SkyCASA</RootNamespace>
-    <ApplicationIcon>app.ico</ApplicationIcon>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +15,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,14 +40,29 @@
     </Reference>
   </ItemGroup>
 
+  <!-- Explicitly include only production source files -->
   <ItemGroup>
-    <Compile Include="*.cs" Exclude="obj\**;bin\**" />
+    <Compile Include="Program.cs" />
+    <Compile Include="MainForm.cs" />
+    <Compile Include="LoginForm.cs" />
+    <Compile Include="AppSettings.cs" />
+    <Compile Include="ConfigManager.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="ErrorHandling.cs" />
+    <Compile Include="DatabaseConnectionFix.cs" />
+    <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="DataAccessLayer.cs" />
+    <Compile Include="PatientService.cs" />
+    <Compile Include="Rec.cs" />
+    <Compile Include="SettingsForm.cs" />
+    <Compile Include="SpermAnalysisForm.cs" />
+    <Compile Include="WHOReportForm.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="database.db">
+    <None Include="database.db" Condition="Exists('database.db')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <Content Include="*.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

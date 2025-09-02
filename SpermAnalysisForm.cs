@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Text.Json;
+using System.Web.Script.Serialization;
 
 namespace SkyCASA
 {
@@ -398,8 +398,8 @@ namespace SkyCASA
                     selectedMediaPath = openFileDialog.FileName;
                     analyzeVideoButton.Enabled = true;
                     
-                    videoResultsTextBox.Text = $"تم تحديد الفيديو: {Path.GetFileName(selectedMediaPath)}\\n";
-                    videoResultsTextBox.Text += "جاهز للتحليل بالذكاء الاصطناعي...\\n";
+                    videoResultsTextBox.Text = $"تم تحديد الفيديو: {Path.GetFileName(selectedMediaPath)}\n";
+                    videoResultsTextBox.Text += "جاهز للتحليل بالذكاء الاصطناعي...\n";
                 }
             }
         }
@@ -413,8 +413,8 @@ namespace SkyCASA
             analysisProgressBar.Visible = true;
             analysisProgressBar.Style = ProgressBarStyle.Marquee;
             
-            videoResultsTextBox.Text = "🎬 بدء تحليل الفيديو بالذكاء الاصطناعي...\\n";
-            videoResultsTextBox.Text += "📊 سيتم حساب معايير CASA المتقدمة...\\n\\n";
+            videoResultsTextBox.Text = "🎬 بدء تحليل الفيديو بالذكاء الاصطناعي...\n";
+            videoResultsTextBox.Text += "📊 سيتم حساب معايير CASA المتقدمة...\n\n";
             
             try
             {
@@ -431,7 +431,7 @@ namespace SkyCASA
             }
             catch (Exception ex)
             {
-                videoResultsTextBox.Text += $"❌ خطأ في التحليل: {ex.Message}\\n";
+                videoResultsTextBox.Text += $"❌ خطأ في التحليل: {ex.Message}\n";
                 MessageBox.Show($"خطأ في التحليل: {ex.Message}", "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -472,7 +472,8 @@ namespace SkyCASA
                     if (process.ExitCode == 0 && !string.IsNullOrEmpty(output))
                     {
                         // Parse JSON result
-                        var result = JsonSerializer.Deserialize<SpermAnalysisResult>(output);
+                        var serializer = new JavaScriptSerializer();
+                        var result = serializer.Deserialize<SpermAnalysisResult>(output);
                         return result;
                     }
                     else
@@ -489,13 +490,13 @@ namespace SkyCASA
         
         private void DisplayImageResults(SpermAnalysisResult result)
         {
-            var results = $"🧬 نتائج تحليل الصورة:\\n";
-            results += $"═══════════════════════════\\n";
-            results += $"📊 العدد الكلي: {result.TotalCount} حيوان منوي\\n";
-            results += $"🎯 معامل الثقة: {result.AiConfidence:P1}\\n";
-            results += $"📈 التركيز المقدر: {result.ConcentrationEstimation:F1} مليون/مل\\n";
-            results += $"✅ متوافق مع WHO: {(result.WhoCompliance ? "نعم" : "لا")}\\n";
-            results += $"⏰ وقت التحليل: {result.Timestamp}\\n";
+            var results = $"🧬 نتائج تحليل الصورة:\n";
+            results += $"═══════════════════════════\n";
+            results += $"📊 العدد الكلي: {result.TotalCount} حيوان منوي\n";
+            results += $"🎯 معامل الثقة: {result.AiConfidence:P1}\n";
+            results += $"📈 التركيز المقدر: {result.ConcentrationEstimation:F1} مليون/مل\n";
+            results += $"✅ متوافق مع WHO: {(result.WhoCompliance ? "نعم" : "لا")}\n";
+            results += $"⏰ وقت التحليل: {result.Timestamp}\n";
             
             imageResultsLabel.Text = results;
         }
@@ -504,42 +505,42 @@ namespace SkyCASA
         {
             videoResultsTextBox.Clear();
             
-            var results = "🎬 نتائج تحليل الفيديو بالذكاء الاصطناعي\\n";
-            results += "═══════════════════════════════════════\\n\\n";
+            var results = "🎬 نتائج تحليل الفيديو بالذكاء الاصطناعي\n";
+            results += "═══════════════════════════════════════\n\n";
             
-            results += "📊 معلومات عامة:\\n";
-            results += $"   • المدة: {result.DurationSeconds} ثانية\\n";
-            results += $"   • الإطارات: {result.TotalFrames}\\n";
-            results += $"   • المسارات المكتشفة: {result.TotalTracks}\\n";
-            results += $"   • المسارات الصالحة: {result.ValidTracks}\\n\\n";
+            results += "📊 معلومات عامة:\n";
+            results += $"   • المدة: {result.DurationSeconds} ثانية\n";
+            results += $"   • الإطارات: {result.TotalFrames}\n";
+            results += $"   • المسارات المكتشفة: {result.TotalTracks}\n";
+            results += $"   • المسارات الصالحة: {result.ValidTracks}\n\n";
             
             if (result.CasaMetrics != null)
             {
-                results += "🧪 معايير CASA:\\n";
-                results += $"   • VCL: {result.CasaMetrics.VclMean:F1} μm/s (السرعة المنحنية)\\n";
-                results += $"   • VSL: {result.CasaMetrics.VslMean:F1} μm/s (السرعة المستقيمة)\\n";
-                results += $"   • VAP: {result.CasaMetrics.VapMean:F1} μm/s (متوسط سرعة المسار)\\n";
-                results += $"   • LIN: {result.CasaMetrics.LinMean:F1}% (الخطية)\\n";
-                results += $"   • STR: {result.CasaMetrics.StrMean:F1}% (الاستقامة)\\n";
-                results += $"   • WOB: {result.CasaMetrics.WobMean:F1}% (التذبذب)\\n";
-                results += $"   • ALH: {result.CasaMetrics.AlhMean:F1} μm (الانحراف الجانبي)\\n";
-                results += $"   • BCF: {result.CasaMetrics.BcfMean:F1} Hz (تردد النبضة)\\n\\n";
+                results += "🧪 معايير CASA:\n";
+                results += $"   • VCL: {result.CasaMetrics.VclMean:F1} μm/s (السرعة المنحنية)\n";
+                results += $"   • VSL: {result.CasaMetrics.VslMean:F1} μm/s (السرعة المستقيمة)\n";
+                results += $"   • VAP: {result.CasaMetrics.VapMean:F1} μm/s (متوسط سرعة المسار)\n";
+                results += $"   • LIN: {result.CasaMetrics.LinMean:F1}% (الخطية)\n";
+                results += $"   • STR: {result.CasaMetrics.StrMean:F1}% (الاستقامة)\n";
+                results += $"   • WOB: {result.CasaMetrics.WobMean:F1}% (التذبذب)\n";
+                results += $"   • ALH: {result.CasaMetrics.AlhMean:F1} μm (الانحراف الجانبي)\n";
+                results += $"   • BCF: {result.CasaMetrics.BcfMean:F1} Hz (تردد النبضة)\n\n";
             }
             
             if (result.MotilityAnalysis != null)
             {
-                results += "🏃 تحليل الحركة:\\n";
-                results += $"   • سريع ومتقدم (A): {result.MotilityAnalysis.RapidProgressivePercent:F1}%\\n";
-                results += $"   • بطيء ومتقدم (B): {result.MotilityAnalysis.SlowProgressivePercent:F1}%\\n";
-                results += $"   • حركة في المكان (C): {result.MotilityAnalysis.NonProgressivePercent:F1}%\\n";
-                results += $"   • غير متحرك (D): {result.MotilityAnalysis.ImmotilePercent:F1}%\\n";
-                results += $"   • الحركة التقدمية الكلية: {result.MotilityAnalysis.TotalProgressivePercent:F1}%\\n";
-                results += $"   • الحركة الكلية: {result.MotilityAnalysis.TotalMotilePercent:F1}%\\n\\n";
+                results += "🏃 تحليل الحركة:\n";
+                results += $"   • سريع ومتقدم (A): {result.MotilityAnalysis.RapidProgressivePercent:F1}%\n";
+                results += $"   • بطيء ومتقدم (B): {result.MotilityAnalysis.SlowProgressivePercent:F1}%\n";
+                results += $"   • حركة في المكان (C): {result.MotilityAnalysis.NonProgressivePercent:F1}%\n";
+                results += $"   • غير متحرك (D): {result.MotilityAnalysis.ImmotilePercent:F1}%\n";
+                results += $"   • الحركة التقدمية الكلية: {result.MotilityAnalysis.TotalProgressivePercent:F1}%\n";
+                results += $"   • الحركة الكلية: {result.MotilityAnalysis.TotalMotilePercent:F1}%\n\n";
             }
             
-            results += $"🎯 معامل الثقة في التحليل: {result.AiConfidence:P1}\\n";
-            results += $"✅ متوافق مع معايير WHO: {(result.WhoCompliance ? "نعم" : "لا")}\\n";
-            results += $"⏰ اكتمل التحليل في: {DateTime.Now:HH:mm:ss}\\n";
+            results += $"🎯 معامل الثقة في التحليل: {result.AiConfidence:P1}\n";
+            results += $"✅ متوافق مع معايير WHO: {(result.WhoCompliance ? "نعم" : "لا")}\n";
+            results += $"⏰ اكتمل التحليل في: {DateTime.Now:HH:mm:ss}\n";
             
             videoResultsTextBox.Text = results;
         }

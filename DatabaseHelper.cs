@@ -16,17 +16,11 @@ public static class DatabaseHelper
     /// <param name="dbPath">Path to the SQLite database file</param>
     public static void Initialize(string dbPath)
     {
-        // Use our improved connection fixer
-        connectionString = DatabaseConnectionFix.FixSQLiteConnection(dbPath);
+        // Use improved connection bootstrap (creates DB if missing)
+        connectionString = DatabaseConnectionFix.GetDatabaseConnection(dbPath);
         Logger.LogInfo($"Database helper initialized with connection string: {connectionString}");
     }
     
-    /// <summary>
-    /// Executes a SELECT query and returns a DataTable
-    /// </summary>
-    /// <param name="query">SQL SELECT query</param>
-    /// <param name="parameters">Query parameters</param>
-    /// <returns>DataTable with query results</returns>
     public static DataTable ExecuteQuery(string query, params object[] parameters)
     {
         try
@@ -34,15 +28,12 @@ public static class DatabaseHelper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
                     AddParameters(cmd, parameters);
-                    
                     var adapter = new SQLiteDataAdapter(cmd);
                     var dataTable = new DataTable();
                     adapter.Fill(dataTable);
-                    
                     Logger.LogInfo($"Executed query: {query}");
                     return dataTable;
                 }
@@ -55,12 +46,6 @@ public static class DatabaseHelper
         }
     }
     
-    /// <summary>
-    /// Executes a non-query SQL statement (INSERT, UPDATE, DELETE)
-    /// </summary>
-    /// <param name="query">SQL query</param>
-    /// <param name="parameters">Query parameters</param>
-    /// <returns>Number of affected rows</returns>
     public static int ExecuteNonQuery(string query, params object[] parameters)
     {
         try
@@ -68,11 +53,9 @@ public static class DatabaseHelper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
                     AddParameters(cmd, parameters);
-                    
                     int result = cmd.ExecuteNonQuery();
                     Logger.LogInfo($"Executed non-query: {query}, affected rows: {result}");
                     return result;
@@ -86,12 +69,6 @@ public static class DatabaseHelper
         }
     }
     
-    /// <summary>
-    /// Executes a query that returns a single value
-    /// </summary>
-    /// <param name="query">SQL query</param>
-    /// <param name="parameters">Query parameters</param>
-    /// <returns>Single value result</returns>
     public static object ExecuteScalar(string query, params object[] parameters)
     {
         try
@@ -99,11 +76,9 @@ public static class DatabaseHelper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
                     AddParameters(cmd, parameters);
-                    
                     object result = cmd.ExecuteScalar();
                     Logger.LogInfo($"Executed scalar query: {query}");
                     return result;
@@ -117,27 +92,18 @@ public static class DatabaseHelper
         }
     }
     
-    /// <summary>
-    /// Gets all table names in the database
-    /// </summary>
-    /// <returns>List of table names</returns>
     public static List<string> GetTableNames()
     {
         var tables = new List<string>();
-        
         try
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                
                 using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table'", connection))
                 using (var reader = cmd.ExecuteReader())
                 {
-                    while (reader.Read())
-                    {
-                        tables.Add(reader.GetString(0));
-                    }
+                    while (reader.Read()) tables.Add(reader.GetString(0));
                 }
             }
             Logger.LogInfo($"Retrieved {tables.Count} table names from database");
@@ -147,15 +113,9 @@ public static class DatabaseHelper
             Logger.LogException(ex, "DatabaseHelper.GetTableNames");
             throw new Exception($"Error getting table names: {ex.Message}", ex);
         }
-        
         return tables;
     }
     
-    /// <summary>
-    /// Checks if a table exists in the database
-    /// </summary>
-    /// <param name="tableName">Name of the table to check</param>
-    /// <returns>True if table exists, false otherwise</returns>
     public static bool TableExists(string tableName)
     {
         try
@@ -163,7 +123,6 @@ public static class DatabaseHelper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                
                 using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name=@tableName", connection))
                 {
                     cmd.Parameters.AddWithValue("@tableName", tableName);
@@ -183,12 +142,6 @@ public static class DatabaseHelper
         }
     }
     
-    /// <summary>
-    /// Creates a table if it doesn't exist
-    /// </summary>
-    /// <param name="tableName">Name of the table to create</param>
-    /// <param name="columns">Column definitions</param>
-    /// <returns>True if table was created or already exists, false if error occurred</returns>
     public static bool CreateTableIfNotExists(string tableName, string columns)
     {
         try
@@ -198,10 +151,8 @@ public static class DatabaseHelper
                 Logger.LogInfo($"Table '{tableName}' already exists, skipping creation");
                 return true;
             }
-            
             string createTableQuery = $"CREATE TABLE {tableName} ({columns})";
             int result = ExecuteNonQuery(createTableQuery);
-            
             Logger.LogInfo($"Created table '{tableName}' successfully");
             return result >= 0;
         }
@@ -212,17 +163,12 @@ public static class DatabaseHelper
         }
     }
     
-    /// <summary>
-    /// Adds parameters to a SQLite command
-    /// </summary>
     private static void AddParameters(SQLiteCommand cmd, object[] parameters)
     {
         if (parameters != null)
         {
             for (int i = 0; i < parameters.Length; i++)
-            {
                 cmd.Parameters.AddWithValue($"@param{i}", parameters[i] ?? DBNull.Value);
-            }
         }
     }
 }

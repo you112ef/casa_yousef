@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SkyCASA
@@ -485,7 +486,7 @@ namespace SkyCASA
         }
         
         private void CreateAnalysisGroup(string title, string[] buttonTexts, string[] buttonNames, Color[] colors, 
-                                      TableLayoutPanel parent, int col, int row)
+                                          TableLayoutPanel parent, int col, int row)
         {
             var groupBox = new GroupBox(title);
             groupBox.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
@@ -622,7 +623,7 @@ namespace SkyCASA
         private void OpenAnalysisForm(string analysisType)
         {
             // TODO: Create specific analysis forms for each type
-            MessageBox.Show($"فتح نموذج تحليل {analysisType}\\nOpening {analysisType} analysis form", 
+            MessageBox.Show($"فتح نموذج تحليل {analysisType}\nOpening {analysisType} analysis form", 
                            "قيد التطوير", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         
@@ -644,7 +645,7 @@ namespace SkyCASA
         
         private void OpenSettingsForm()
         {
-            MessageBox.Show("نموذج الإعدادات قيد التطوير\\nSettings form under development", 
+            MessageBox.Show("نموذج الإعدادات قيد التطوير\nSettings form under development", 
                            "قيد التطوير", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         
@@ -662,21 +663,21 @@ namespace SkyCASA
             textBox.BackColor = Color.Black;
             textBox.ForeColor = Color.LimeGreen;
             
-            textBox.Text = "🔧 Sky CASA System Test\\n";
-            textBox.Text += "════════════════════════\\n\\n";
-            textBox.Text += "✅ Database connection: OK\\n";
-            textBox.Text += "✅ Patient data: Available\\n";
-            textBox.Text += "✅ Analysis modules: Loaded\\n";
-            textBox.Text += "✅ AI System: Ready\\n";
-            textBox.Text += "✅ User interface: Active\\n\\n";
-            textBox.Text += "📊 Statistics:\\n";
-            textBox.Text += $"   • Patients: {GetPatientCount()}\\n";
-            textBox.Text += $"   • CBC Tests: {GetTestCount("cbc")}\\n";
-            textBox.Text += $"   • Urine Tests: {GetTestCount("urine")}\\n";
-            textBox.Text += $"   • Stool Tests: {GetTestCount("stool")}\\n";
-            textBox.Text += $"   • Kidney Tests: {GetTestCount("kidney_function")}\\n";
-            textBox.Text += $"   • Liver Tests: {GetTestCount("liver_function")}\\n";
-            textBox.Text += $"   • AI Sperm Tests: {GetTestCount("semen_analysis")}\\n\\n";
+            textBox.Text = "🔧 Sky CASA System Test\n";
+            textBox.Text += "════════════════════════\n\n";
+            textBox.Text += "✅ Database connection: OK\n";
+            textBox.Text += "✅ Patient data: Available\n";
+            textBox.Text += "✅ Analysis modules: Loaded\n";
+            textBox.Text += "✅ AI System: Ready\n";
+            textBox.Text += "✅ User interface: Active\n\n";
+            textBox.Text += "📊 Statistics:\n";
+            textBox.Text += $"   • Patients: {GetPatientCount()}\n";
+            textBox.Text += $"   • CBC Tests: {GetTestCount("cbc")}\n";
+            textBox.Text += $"   • Urine Tests: {GetTestCount("urine")}\n";
+            textBox.Text += $"   • Stool Tests: {GetTestCount("stool")}\n";
+            textBox.Text += $"   • Kidney Tests: {GetTestCount("kidney_function")}\n";
+            textBox.Text += $"   • Liver Tests: {GetTestCount("liver_function")}\n";
+            textBox.Text += $"   • AI Sperm Tests: {GetTestCount("semen_analysis")}\n\n";
             textBox.Text += "🎉 All systems operational!";
             
             testForm.Controls.Add(textBox);

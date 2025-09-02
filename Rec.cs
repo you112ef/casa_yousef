@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace Sky_CASA
+namespace SkyCASA
 {
     public partial class Rec : Form
     {
@@ -38,7 +38,6 @@ namespace Sky_CASA
             
             // Search TextBox
             this.txtSearch.Dock = DockStyle.Top;
-            this.txtSearch.PlaceholderText = "Enter patient name to search...";
             
             // Search Button
             this.btnSearch.Text = "Search";

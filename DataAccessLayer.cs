@@ -14,8 +14,8 @@ public class DataAccessLayer
     
     public DataAccessLayer(string dbPath)
     {
-        // Use our improved connection fixer
-        connectionString = DatabaseConnectionFix.FixSQLiteConnection(dbPath);
+        // Use improved connection bootstrap (creates DB if missing)
+        connectionString = DatabaseConnectionFix.GetDatabaseConnection(dbPath);
     }
     
     /// <summary>
