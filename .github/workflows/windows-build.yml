@@ -1,0 +1,60 @@
+name: Build and Package Sky CASA (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths:
+      - '**.cs'
+      - '**.csproj'
+      - 'SkyCASA.sln'
+      - '.github/workflows/windows-build.yml'
+      - 'installer/**'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore packages
+        run: nuget restore SkyCASA.sln
+
+      - name: Build Release
+        run: msbuild SkyCASA.sln /p:Configuration=Release /m
+
+      - name: Determine build directory
+        id: paths
+        shell: powershell
+        run: |
+          if (Test-Path "bin/Release/net472/Sky_CASA.exe") { echo "builddir=bin/Release/net472" >> $env:GITHUB_OUTPUT }
+          elseif (Test-Path "bin/Release/Sky_CASA.exe") { echo "builddir=bin/Release" >> $env:GITHUB_OUTPUT }
+          else { Write-Host "No build output found"; exit 1 }
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: |
+          choco install innosetup -y
+
+      - name: Build Installer
+        shell: powershell
+        run: |
+          $builddir = '${{ steps.paths.outputs.builddir }}'
+          & "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe" installer\\sky-casa.iss /DBuildDir=$builddir
+
+      - name: Collect artifacts
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          Copy-Item ${{ steps.paths.outputs.builddir }}\\* artifacts/ -Recurse -Force
+          if (Test-Path installer\\Output\\Sky-CASA-Setup.exe) { Copy-Item installer\\Output\\Sky-CASA-Setup.exe artifacts/ -Force }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SkyCASA-Release-Windows
+          path: artifacts

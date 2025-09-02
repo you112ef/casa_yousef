@@ -1,0 +1,109 @@
+SQL LOGIC ERROR IDENTIFICATION AND FIXING GUIDE
+============================================
+
+Since we don't have direct access to the source code or the ability to examine the database structure in detail,
+here are common SQL logic errors and how to identify/fix them:
+
+COMMON SQL LOGIC ERRICS AND SOLUTIONS
+-----------------------------------
+
+1. NULL VALUE HANDLING
+   Problem: Queries that don't handle NULL values properly
+   Solution: Use ISNULL(), COALESCE(), or proper WHERE conditions
+   Example:
+   -- Problematic:
+   SELECT * FROM users WHERE age = 25;
+   
+   -- Better:
+   SELECT * FROM users WHERE age = 25 AND age IS NOT NULL;
+
+2. JOIN ERRORS
+   Problem: Incorrect JOIN conditions leading to Cartesian products or missing data
+   Solution: Verify JOIN conditions and use appropriate JOIN types
+   Example:
+   -- Check if you're using the right JOIN type:
+   SELECT u.name, o.order_date 
+   FROM users u 
+   INNER JOIN orders o ON u.id = o.user_id;  -- Only matching records
+   
+   -- vs.
+   SELECT u.name, o.order_date 
+   FROM users u 
+   LEFT JOIN orders o ON u.id = o.user_id;   -- All users, even without orders
+
+3. AGGREGATE FUNCTION ERRORS
+   Problem: Using aggregate functions without proper GROUP BY
+   Solution: Ensure all non-aggregate columns are in GROUP BY
+   Example:
+   -- Problematic:
+   SELECT name, COUNT(*) FROM users;
+   
+   -- Better:
+   SELECT name, COUNT(*) FROM users GROUP BY name;
+
+4. SUBQUERY ERRORS
+   Problem: Subqueries returning multiple values when single value is expected
+   Solution: Use IN, EXISTS, or ensure subquery returns single value
+   Example:
+   -- Problematic:
+   SELECT * FROM users WHERE id = (SELECT user_id FROM orders);
+   
+   -- Better:
+   SELECT * FROM users WHERE id IN (SELECT user_id FROM orders);
+
+5. TRANSACTION ISSUES
+   Problem: Missing or improper transaction handling
+   Solution: Use proper BEGIN/COMMIT/ROLLBACK
+   Example:
+   BEGIN TRANSACTION;
+   INSERT INTO users (name) VALUES ('John');
+   UPDATE orders SET user_id = (SELECT id FROM users WHERE name = 'John') WHERE temp_user = 'John';
+   COMMIT;
+
+DATABASE EXAMINATION NOTES
+-------------------------
+
+Database file: database.db (44 KB)
+Last modified: 08/17/2025 18:30:22
+
+To properly examine and fix SQL logic errors, you would need to:
+
+1. Use a SQLite browser tool like DB Browser for SQLite to:
+   - Open database.db
+   - Examine table structures
+   - View sample data
+   - Run test queries
+
+2. Look for common patterns in your application code:
+   - Check WHERE clauses for proper NULL handling
+   - Verify JOIN conditions
+   - Ensure GROUP BY includes all non-aggregate columns
+   - Check subquery results
+
+3. Enable SQL logging in your application if possible to:
+   - See the actual SQL queries being executed
+   - Identify which queries might be causing issues
+
+RECOMMENDED TOOLS
+----------------
+
+1. DB Browser for SQLite (https://sqlitebrowser.org/)
+   - Free, open-source tool to examine SQLite databases
+   - Can view table structures, data, and run queries
+
+2. SQLite Studio (https://sqlitestudio.pl/)
+   - Another free tool for SQLite database management
+
+NEXT STEPS
+----------
+
+To properly fix SQL logic errors:
+
+1. Download and install DB Browser for SQLite
+2. Open database.db with the tool
+3. Examine table structures and relationships
+4. Identify queries in your application that might have logic errors
+5. Test queries directly in the SQLite browser
+6. Fix any issues found in the application code
+
+If you can provide specific error messages or describe the problematic behavior, more targeted solutions can be provided.

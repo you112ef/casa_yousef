@@ -1,0 +1,213 @@
+SQL LOGIC ERRORS IDENTIFICATION AND FIXING GUIDE
+=============================================
+
+This document provides guidance on identifying and fixing common SQL logic errors that may be present in the Sky CASA application.
+
+COMMON SQL LOGIC ERRORS AND SOLUTIONS
+-----------------------------------
+
+1. NULL VALUE HANDLING ERRORS
+   --------------------------
+   
+   Problem: Using comparison operators (=, !=, <, >) with NULL values
+   Solution: Use IS NULL or IS NOT NULL for NULL comparisons
+   
+   ❌ INCORRECT:
+   SELECT * FROM patients WHERE middle_name = NULL;
+   SELECT * FROM test_results WHERE result != NULL;
+   
+   ✅ CORRECT:
+   SELECT * FROM patients WHERE middle_name IS NULL;
+   SELECT * FROM test_results WHERE result IS NOT NULL;
+
+2. JOIN ERRORS
+   -----------
+   
+   Problem: Using incorrect JOIN types or missing JOIN conditions
+   Solution: Use appropriate JOIN types and ensure proper JOIN conditions
+   
+   ❌ INCORRECT:
+   SELECT p.name, t.result 
+   FROM patients p, test_results t 
+   WHERE p.id = t.patient_id;
+   
+   ✅ CORRECT:
+   SELECT p.name, t.result 
+   FROM patients p 
+   INNER JOIN test_results t ON p.id = t.patient_id;
+
+3. AGGREGATE FUNCTION ERRORS
+   ------------------------
+   
+   Problem: Using non-aggregate columns in SELECT without GROUP BY
+   Solution: Include all non-aggregate columns in GROUP BY clause
+   
+   ❌ INCORRECT:
+   SELECT patient_id, COUNT(*) 
+   FROM test_results;
+   
+   ✅ CORRECT:
+   SELECT patient_id, COUNT(*) 
+   FROM test_results 
+   GROUP BY patient_id;
+
+4. SUBQUERY ERRORS
+   ---------------
+   
+   Problem: Subqueries returning multiple values when single value expected
+   Solution: Use IN, EXISTS, or ensure subquery returns single value
+   
+   ❌ INCORRECT:
+   SELECT * FROM patients 
+   WHERE id = (SELECT patient_id FROM test_results);
+   
+   ✅ CORRECT:
+   SELECT * FROM patients 
+   WHERE id IN (SELECT patient_id FROM test_results);
+
+5. TRANSACTION ERRORS
+   ------------------
+   
+   Problem: Missing or improper transaction handling
+   Solution: Use proper BEGIN/COMMIT/ROLLBACK structure
+   
+   ❌ INCORRECT:
+   INSERT INTO patients (name) VALUES ('John Doe');
+   INSERT INTO test_results (patient_id, test_type, result) VALUES (1, 'CBC', 'Normal');
+   
+   ✅ CORRECT:
+   BEGIN TRANSACTION;
+   INSERT INTO patients (name) VALUES ('John Doe');
+   INSERT INTO test_results (patient_id, test_type, result) VALUES (1, 'CBC', 'Normal');
+   COMMIT;
+
+6. STRING COMPARISON ERRORS
+   ------------------------
+   
+   Problem: Case-sensitive comparisons when case-insensitive is needed
+   Solution: Use UPPER() or LOWER() functions for case-insensitive comparisons
+   
+   ❌ INCORRECT:
+   SELECT * FROM test_types WHERE name = 'cbc';
+   
+   ✅ CORRECT:
+   SELECT * FROM test_types WHERE UPPER(name) = 'CBC';
+
+7. DATE/TIME COMPARISON ERRORS
+   ---------------------------
+   
+   Problem: Improper date/time comparisons
+   Solution: Use proper date functions and formatting
+   
+   ❌ INCORRECT:
+   SELECT * FROM test_results WHERE test_date > '2023-01-01';
+   
+   ✅ CORRECT:
+   SELECT * FROM test_results WHERE test_date > DATE('2023-01-01');
+
+8. NUMERIC COMPARISON ERRORS
+   -------------------------
+   
+   Problem: Comparing numeric values stored as strings
+   Solution: Convert to appropriate numeric type before comparison
+   
+   ❌ INCORRECT:
+   SELECT * FROM test_results WHERE result > '100';
+   
+   ✅ CORRECT:
+   SELECT * FROM test_results WHERE CAST(result AS REAL) > 100;
+
+DATABASE STRUCTURE ANALYSIS
+--------------------------
+
+Based on our examination, the database.db file contains:
+- File size: 45KB
+- Valid SQLite format
+- Contains CREATE TABLE statements
+
+To properly analyze and fix SQL logic errors, we recommend:
+
+1. Using a SQLite database browser tool like DB Browser for SQLite to:
+   - Examine table structures
+   - View sample data
+   - Run test queries
+   - Identify potential issues
+
+2. Common areas to check in medical laboratory applications:
+   - Patient data queries with proper NULL handling
+   - Test result queries with appropriate JOINs
+   - Aggregated reporting queries
+   - Date range filtering for reports
+   - Critical value detection queries
+
+RECOMMENDED FIXING APPROACH
+--------------------------
+
+1. IDENTIFICATION PHASE:
+   - Use database browser to examine table structures
+   - Review application code for SQL queries
+   - Look for error patterns in the existing SQL_LOGIC_NOTES.txt
+
+2. CORRECTION PHASE:
+   - Fix NULL comparison issues
+   - Correct JOIN conditions
+   - Proper GROUP BY usage
+   - Handle subquery return values
+   - Implement proper transaction handling
+
+3. TESTING PHASE:
+   - Test corrected queries with sample data
+   - Verify results match expectations
+   - Check performance implications
+   - Ensure backward compatibility
+
+4. DOCUMENTATION PHASE:
+   - Document fixes made
+   - Update any relevant documentation
+   - Create test cases for future validation
+
+SAMPLE CORRECTED QUERIES
+----------------------
+
+Based on typical medical laboratory application needs:
+
+1. Patient Search with Proper NULL Handling:
+   SELECT patient_id, first_name, last_name, date_of_birth
+   FROM patients
+   WHERE (first_name LIKE '%John%' OR first_name IS NULL)
+   AND (last_name LIKE '%Doe%' OR last_name IS NULL);
+
+2. Test Results with Date Range:
+   SELECT p.first_name, p.last_name, t.test_type, t.result, t.test_date
+   FROM patients p
+   INNER JOIN test_results t ON p.patient_id = t.patient_id
+   WHERE t.test_date BETWEEN DATE('2023-01-01') AND DATE('2023-12-31');
+
+3. Aggregated Report Query:
+   SELECT test_type, COUNT(*) as total_tests, 
+          AVG(CAST(result AS REAL)) as average_result
+   FROM test_results
+   WHERE result IS NOT NULL
+   GROUP BY test_type;
+
+4. Critical Value Detection:
+   SELECT p.first_name, p.last_name, t.test_type, t.result
+   FROM patients p
+   INNER JOIN test_results t ON p.patient_id = t.patient_id
+   WHERE (t.test_type = 'WBC' AND CAST(t.result AS REAL) > 50.0)
+   OR (t.test_type = 'HGB' AND CAST(t.result AS REAL) < 5.0);
+
+NEXT STEPS
+----------
+
+To properly fix SQL logic errors in the Sky CASA application:
+
+1. Download and install DB Browser for SQLite
+2. Open database.db with the tool
+3. Examine table structures and relationships
+4. Identify queries in the application that might have logic errors
+5. Test queries directly in the SQLite browser
+6. Fix any issues found in the application code
+7. Implement proper error handling and logging
+
+If you can provide specific error messages or describe the problematic behavior, more targeted solutions can be provided.

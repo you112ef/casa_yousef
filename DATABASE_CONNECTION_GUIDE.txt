@@ -1,0 +1,133 @@
+DATABASE CONNECTION GUIDE FOR SKY CASA
+====================================
+
+CURRENT DATABASE SITUATION:
+--------------------------
+1. Application Configuration:
+   - The application is configured to use Firebird SQL database
+   - FirebirdSql.Data.FirebirdClient.dll (version 10.3.1.0) is present
+   - App.config has proper binding redirects for Firebird client
+
+2. Available Database Files:
+   - database.db - SQLite database file (45,056 bytes)
+   - No Firebird database files (*.fdb or *.gdb) found
+
+3. CR13SP32MSI64_0-80007712 FOLDER:
+   - Contains Visual C++ runtime DLLs, not a database
+   - These DLLs have been integrated with the application
+   - They provide native runtime support for application components
+
+DATABASE OPTIONS:
+----------------
+
+OPTION 1: USE EXISTING SQLITE DATABASE
+------------------------------------
+The application currently has a SQLite database file (database.db) that can be used.
+
+Connection String: "Data Source=database.db;Version=3;"
+
+To use this database:
+1. Modify the application code to use SQLite instead of Firebird
+2. Ensure System.Data.SQLite.dll is available (currently missing)
+3. Update the DataAccessLayer to work with SQLite
+
+OPTION 2: CREATE A NEW FIREBIRD DATABASE
+--------------------------------------
+Create a new Firebird database for the application.
+
+Steps:
+1. Install Firebird Server or Firebird Embedded Server
+2. Create a new database file:
+   Command: isql -u SYSDBA -p masterkey
+   SQL: CREATE DATABASE 'sky_casa.fdb' USER 'SYSDBA' PASSWORD 'masterkey';
+3. Create required tables based on the schema in database.db
+4. Update connection strings in the application
+
+OPTION 3: CONNECT TO EXISTING FIREBIRD DATABASE
+---------------------------------------------
+If you have an existing Firebird database:
+
+1. Copy the .fdb file to the application directory
+2. Update the connection string in the application code
+3. Ensure the database schema matches application requirements
+
+CONNECTION STRING EXAMPLES:
+--------------------------
+
+SQLite:
+"Data Source=database.db;Version=3;"
+
+Firebird:
+"User=SYSDBA;Password=masterkey;Database=sky_casa.fdb;DataSource=localhost;Port=3050;"
+
+Firebird Embedded:
+"User=SYSDBA;Password=masterkey;Database=sky_casa.fdb;ServerType=1;"
+
+REQUIRED COMPONENTS:
+-------------------
+
+For SQLite:
+1. System.Data.SQLite.dll (currently missing)
+2. SQLite native libraries
+
+For Firebird:
+1. FirebirdSql.Data.FirebirdClient.dll (present)
+2. Firebird client libraries or embedded server
+
+DATABASE SCHEMA ANALYSIS:
+------------------------
+The existing SQLite database.db contains the following tables:
+- sem
+- ret
+- stool
+- urine
+- cbc
+- vis
+- dr
+- path
+- log
+- admin
+- sqlite_sequence
+- path_vis (created during fixes)
+
+IMPLEMENTATION RECOMMENDATIONS:
+------------------------------
+
+1. FOR DEVELOPMENT/TESTING:
+   Use the existing SQLite database with minimal changes:
+   - Install System.Data.SQLite NuGet package
+   - Update DataAccessLayer to use SQLiteConnection instead of FbConnection
+   - Keep the same table structure
+
+2. FOR PRODUCTION:
+   Create a proper Firebird database:
+   - Install Firebird Server
+   - Create database with proper security settings
+   - Migrate data from SQLite to Firebird
+   - Update application to use Firebird connection strings
+
+MIGRATION STEPS (SQLite to Firebird):
+-----------------------------------
+1. Export data from SQLite database
+2. Create equivalent table structure in Firebird
+3. Import data to Firebird database
+4. Update application connection strings
+5. Test all functionality
+
+FILES IN PROJECT:
+----------------
+1. database.db - SQLite database (45,056 bytes)
+2. FirebirdSql.Data.FirebirdClient.dll - Firebird client library
+3. App.config - Contains Firebird assembly binding redirects
+
+VERIFICATION:
+------------
+Run VERIFY_ALL_FIXES.bat to confirm all required components are present.
+
+NEXT STEPS:
+----------
+1. Decide which database option to implement
+2. Install required database drivers/components
+3. Create/update database files
+4. Update application connection strings
+5. Test database connectivity

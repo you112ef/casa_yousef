@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>Sky_CASA</AssemblyName>
+    <RootNamespace>SkyCASA</RootNamespace>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Stub.System.Data.SQLite.Core.NetFramework" Version="1.0.118" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AForge">
+      <HintPath>AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video">
+      <HintPath>AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow">
+      <HintPath>AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
+    <Reference Include="FirebirdSql.Data.FirebirdClient">
+      <HintPath>FirebirdSql.Data.FirebirdClient.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Explicitly include only production source files -->
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="MainForm.cs" />
+    <Compile Include="LoginForm.cs" />
+    <Compile Include="AppSettings.cs" />
+    <Compile Include="ConfigManager.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="ErrorHandling.cs" />
+    <Compile Include="DatabaseConnectionFix.cs" />
+    <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="DataAccessLayer.cs" />
+    <Compile Include="PatientService.cs" />
+    <Compile Include="Rec.cs" />
+    <Compile Include="SettingsForm.cs" />
+    <Compile Include="SpermAnalysisForm.cs" />
+    <Compile Include="WHOReportForm.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="database.db" Condition="Exists('database.db')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

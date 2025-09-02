@@ -1,0 +1,125 @@
+DATAGRIDVIEW DATE CONVERSION ERROR FIX
+=====================================
+
+ERROR DETAILS:
+-------------
+Exception: System.InvalidCastException
+Message: التحويل من السلسلة "2025-09-01 00:00:00" إلى النوع 'Date' غير صالح.
+Location: Sky_CASA.Rec.DataGridView1_Click
+
+This error occurs when the application tries to convert the string "2025-09-01 00:00:00" to a Date type in the DataGridView1_Click event.
+
+PROBLEMATIC CODE PATTERNS:
+-------------------------
+Look for code in the Rec form's DataGridView1_Click event that looks like:
+
+```vb
+' Problematic - Direct conversion that can fail
+Dim selectedDate As Date = CDate(DataGridView1.SelectedRows(0).Cells("DateColumn").Value)
+' or
+Dim selectedDate As Date = CType(DataGridView1.SelectedRows(0).Cells("DateColumn").Value, Date)
+' or
+Dim dateString As String = DataGridView1.SelectedRows(0).Cells("DateColumn").Value.ToString()
+Dim selectedDate As Date = CDate(dateString)
+```
+
+SOLUTION:
+--------
+1. Use the SafeConversionHelper functions that were added to the project
+2. Replace direct date conversions with safe conversions
+
+FIX IMPLEMENTATION:
+------------------
+In the DataGridView1_Click event, replace problematic code with:
+
+```vb
+' Safe approach using the new helper function
+Dim dateString As String = ""
+If DataGridView1.SelectedRows.Count > 0 Then
+    Dim cellValue As Object = DataGridView1.SelectedRows(0).Cells("DateColumn").Value
+    If cellValue IsNot Nothing AndAlso Not IsDBNull(cellValue) Then
+        dateString = cellValue.ToString()
+    End If
+End If
+
+' Use the safe conversion function
+Dim selectedDate As Date
+If Not SafeConversionHelper.TryConvertToDate(dateString, selectedDate, "Selected Date") Then
+    ' Error message already shown by TryConvertToDate
+    Exit Sub
+End If
+
+' Now you can safely use selectedDate
+```
+
+Or for a simpler approach with a default value:
+
+```vb
+' Simple approach with default value
+Dim dateString As String = ""
+If DataGridView1.SelectedRows.Count > 0 Then
+    Dim cellValue As Object = DataGridView1.SelectedRows(0).Cells("DateColumn").Value
+    If cellValue IsNot Nothing AndAlso Not IsDBNull(cellValue) Then
+        dateString = cellValue.ToString()
+    End If
+End If
+
+' Use the safe conversion function with default value
+Dim selectedDate As Date = SafeConversionHelper.SafeConvertToDate(dateString, DateTime.Now)
+```
+
+ADDITIONAL CONSIDERATIONS:
+------------------------
+1. Check if the DataGridView cell value is null before converting
+2. Handle cases where the DataGridView might not have selected rows
+3. Validate that the cell contains a valid date string
+4. Consider using DateTime.TryParse directly if you prefer not to use the helper
+
+EXAMPLE COMPLETE FIX:
+-------------------
+```vb
+Private Sub DataGridView1_Click(sender As Object, e As EventArgs) Handles DataGridView1.Click
+    Try
+        ' Check if there are selected rows
+        If DataGridView1.SelectedRows.Count > 0 Then
+            ' Get the date value from the selected row
+            Dim dateValue As Object = DataGridView1.SelectedRows(0).Cells("DateColumnName").Value
+            
+            ' Handle null values
+            Dim dateString As String = ""
+            If dateValue IsNot Nothing AndAlso Not IsDBNull(dateValue) Then
+                dateString = dateValue.ToString()
+            End If
+            
+            ' Safely convert to date
+            Dim selectedDate As Date = SafeConversionHelper.SafeConvertToDate(dateString, DateTime.Now)
+            
+            ' Use the selectedDate value for further processing
+            ' Example: txtDate.Text = selectedDate.ToString("yyyy-MM-dd")
+        End If
+    Catch ex As Exception
+        MessageBox.Show("Error processing date selection: " & ex.Message, "Date Conversion Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    End Try
+End Sub
+```
+
+FILES MODIFIED:
+-------------
+1. SafeConversionHelper.vb - Added safe date conversion functions
+
+FILES TO MODIFY:
+---------------
+1. The Rec form file containing DataGridView1_Click event (location unknown)
+   - Replace direct date conversions with safe conversions using the helper functions
+
+VERIFICATION:
+------------
+After implementing the fix:
+1. Run the application
+2. Click on rows in the DataGridView
+3. Verify that no InvalidCastException occurs
+4. Confirm that dates are properly handled and displayed
+
+The SafeConversionHelper module now includes:
+- SafeConvertToDate: Converts string to Date with default value
+- TryConvertToDate: Converts string to Date with error reporting

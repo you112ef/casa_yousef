@@ -1,0 +1,191 @@
+COMPREHENSIVE ERROR HANDLING GUIDE FOR SKY CASA
+=============================================
+
+This guide provides solutions for common error types encountered in the Sky CASA application.
+
+1. DATA CONVERSION ERRORS
+========================
+
+1.1. Double/Decimal Conversion Errors
+------------------------------------
+Problem: System.InvalidCastException when converting empty strings to numeric types
+
+Solution: Use SafeConversionHelper functions
+
+BEFORE (Problematic):
+```vb
+Dim price As Double = CDbl(txtPrice.Text)
+Dim quantity As Double = Convert.ToDouble(txtQuantity.Text)
+```
+
+AFTER (Fixed):
+```vb
+' Simple approach with default value
+Dim price As Double = SafeConversionHelper.SafeConvertToDouble(txtPrice.Text, 0.0)
+
+' Or with error reporting
+Dim quantity As Double
+If Not SafeConversionHelper.TryConvertToDouble(txtQuantity.Text, quantity, "Quantity") Then
+    Exit Sub ' Error message already shown
+End If
+```
+
+1.2. Date Conversion Errors
+--------------------------
+Problem: System.InvalidCastException when converting strings to Date types
+Error: "التحويل من السلسلة "2025-09-01 00:00:00" إلى النوع 'Date' غير صالح."
+
+Solution: Use SafeConversionHelper date functions
+
+BEFORE (Problematic):
+```vb
+Dim selectedDate As Date = CDate(DataGridView1.SelectedRows(0).Cells("DateColumn").Value)
+```
+
+AFTER (Fixed):
+```vb
+' Get the date string safely
+Dim dateString As String = ""
+If DataGridView1.SelectedRows.Count > 0 Then
+    Dim cellValue As Object = DataGridView1.SelectedRows(0).Cells("DateColumn").Value
+    If cellValue IsNot Nothing AndAlso Not IsDBNull(cellValue) Then
+        dateString = cellValue.ToString()
+    End If
+End If
+
+' Safely convert to date
+Dim selectedDate As Date = SafeConversionHelper.SafeConvertToDate(dateString, DateTime.Now)
+```
+
+Or with error reporting:
+```vb
+Dim selectedDate As Date
+If Not SafeConversionHelper.TryConvertToDate(dateString, selectedDate, "Selected Date") Then
+    Exit Sub ' Error message already shown
+End If
+```
+
+2. DATABASE ACCESS ERRORS
+========================
+
+2.1. Safe Data Access Patterns
+-----------------------------
+Use the DataAccessLayer for safe database operations:
+
+```vb
+' Safe database query
+Dim dal As New DataAccessLayer("database.db")
+Try
+    Dim data As DataTable = dal.ExecuteQuery("SELECT * FROM patients WHERE last_name = @param0", "Smith")
+    ' Process data safely
+    For Each row As DataRow In data.Rows
+        Dim name As String = DataAccessLayer.SafeGetString(row, "first_name", "Unknown")
+        Dim age As Integer = DataAccessLayer.SafeGetInt32(row, "age", 0)
+    Next
+Catch ex As Exception
+    MessageBox.Show("Database error: " & ex.Message)
+End Try
+```
+
+3. ASSEMBLY LOADING ERRORS
+=========================
+
+3.1. Configuration File Setup
+----------------------------
+Ensure app.config has proper binding redirects (already done):
+```xml
+<configuration>
+    <system.windows.forms jitDebugging="true" />
+    <runtime>
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+            <!-- Binding redirects for all required assemblies -->
+        </assemblyBinding>
+    </runtime>
+</configuration>
+```
+
+4. BEST PRACTICES
+================
+
+4.1. Input Validation
+--------------------
+Always validate user input before processing:
+
+```vb
+' Check for null/empty values
+If String.IsNullOrWhiteSpace(txtInput.Text) Then
+    MessageBox.Show("Please enter a value")
+    txtInput.Focus()
+    Exit Sub
+End If
+```
+
+4.2. Error Handling
+------------------
+Use Try-Catch blocks for operations that might fail:
+
+```vb
+Try
+    ' Code that might throw exceptions
+    Dim result As Double = SafeConversionHelper.SafeConvertToDouble(txtValue.Text)
+    ProcessResult(result)
+Catch ex As Exception
+    MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+End Try
+```
+
+4.3. Resource Management
+-----------------------
+Use Using statements for proper resource disposal:
+
+```vb
+Using connection As New SQLiteConnection(connectionString)
+    connection.Open()
+    ' Use connection
+End Using
+' Connection automatically disposed
+```
+
+5. SAFE CONVERSION HELPER FUNCTIONS
+=================================
+
+The SafeConversionHelper.vb module provides:
+
+5.1. Numeric Conversions
+-----------------------
+- SafeConvertToDouble(input, defaultValue)
+- TryConvertToDouble(input, result, fieldName)
+- SafeConvertObjectToDouble(value, defaultValue)
+
+5.2. Date Conversions
+--------------------
+- SafeConvertToDate(input, defaultValue)
+- TryConvertToDate(input, result, fieldName)
+
+6. IMPLEMENTATION STEPS
+======================
+
+For the specific DataGridView date conversion error:
+
+1. Locate the Rec form's DataGridView1_Click event handler
+2. Identify the problematic date conversion code
+3. Replace with safe conversion using SafeConversionHelper functions
+4. Test the fix by running the application and clicking on DataGridView rows
+
+7. VERIFICATION
+==============
+
+After implementing fixes:
+1. Run VERIFY_ALL_FIXES.bat to confirm all dependencies are present
+2. Launch the application using Run_Sky_CASA.bat
+3. Test the specific functionality that was causing errors
+4. Check Windows Event Viewer for any remaining issues
+
+FILES PROVIDED:
+-------------
+1. SafeConversionHelper.vb - Helper functions for safe conversions
+2. DATAGRIDVIEW_DATE_CONVERSION_FIX.txt - Specific fix for DataGridView date errors
+3. DataAccessLayer.vb/cs - Safe database access patterns
+4. This guide - Comprehensive error handling instructions
+
+The Sky CASA application should now handle data conversion errors gracefully without crashing.

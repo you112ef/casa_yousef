@@ -1,0 +1,142 @@
+UI COMPONENTS PLAN FOR CBC ANALYSIS TYPE
+======================================
+
+1. DATA ENTRY FORM
+-----------------
+Form Name: frmCBCTestEntry
+
+Layout Structure:
+- Patient Information Section (Top)
+  * Patient ID (auto-filled from search)
+  * Patient Name
+  * Date of Birth
+  * Gender
+  * Test Date (default to current date)
+  * Technician ID (auto-filled from logged-in user)
+
+- Basic CBC Results Section (Middle Left)
+  * WBC: [_______] x10^9/L (Normal: 4.0-11.0)
+  * RBC: [_______] x10^12/L (Normal: Male 4.2-5.9, Female 3.8-5.2)
+  * Hemoglobin: [_______] g/dL (Normal: Male 13.5-17.5, Female 12.0-15.5)
+  * Hematocrit: [_______] % (Normal: Male 38.3-48.6, Female 35.5-44.9)
+  * MCV: [_______] fL (Normal: 80-100)
+  * MCH: [_______] pg (Normal: 27-33)
+  * MCHC: [_______] g/dL (Normal: 32-36)
+  * RDW: [_______] % (Normal: 11.5-14.5)
+
+- Platelet Section (Middle Right)
+  * Platelet Count: [_______] x10^9/L (Normal: 150-450)
+  * MPV: [_______] fL (Normal: 7.5-11.5)
+  * PDW: [_______] fL
+
+- Differential Count Section (Bottom - Tabbed Interface)
+  * Tab 1: Percentages
+    - Neutrophils: [_______] % (Normal: 40-75)
+    - Lymphocytes: [_______] % (Normal: 20-40)
+    - Monocytes: [_______] % (Normal: 2-10)
+    - Eosinophils: [_______] % (Normal: 0-6)
+    - Basophils: [_______] % (Normal: 0-2)
+    - Bands: [_______] % (Normal: 0-3)
+    - Atypical Lymphocytes: [_______] %
+    - NRBC: [_______]
+
+  * Tab 2: Absolute Counts
+    - Neutrophils: [_______] x10^9/L
+    - Lymphocytes: [_______] x10^9/L
+    - Monocytes: [_______] x10^9/L
+    - Eosinophils: [_______] x10^9/L
+    - Basophils: [_______] x10^9/L
+    - Bands: [_______] x10^9/L
+
+- Interpretation Section (Bottom)
+  * WBC Interpretation: [Auto-generated based on value]
+  * RBC Interpretation: [Auto-generated based on value]
+  * HGB Interpretation: [Auto-generated based on value]
+  * PLT Interpretation: [Auto-generated based on value]
+  * Differential Interpretation: [Multi-line text area]
+  * Critical Value Flag: [Checkbox - auto-checked if critical values detected]
+  * Comments: [Multi-line text area]
+
+- Action Buttons (Bottom)
+  * Save
+  * Clear
+  * Print
+  * Cancel
+
+Validation Features:
+- Real-time validation as values are entered
+- Color coding for out-of-range values (red for abnormal)
+- Automatic calculation of absolute counts if percentages and WBC are provided
+- Automatic calculation of derived values (MCH, MCHC, etc.)
+- Required field validation
+- Critical value detection and alert
+
+2. RESULT DISPLAY FORM
+---------------------
+Form Name: frmCBCResultsView
+
+Layout Structure:
+- Search Section (Top)
+  * Patient ID/Name Search
+  * Date Range Filter
+  * Quick Filter Buttons (Today, This Week, This Month)
+
+- Results Grid (Middle)
+  * Patient Name
+  * Test Date
+  * WBC
+  * RBC
+  * HGB
+  * PLT
+  * Critical Value Flag
+  * Status
+
+- Detailed View Panel (Bottom)
+  * When a row is selected, show all CBC values
+  * Graphical representation of trends (if multiple tests)
+  * Interpretation summary
+  * Comments
+
+- Action Buttons
+  * View Detailed Report
+  * Print
+  * Export to PDF/Excel
+  * Edit (if authorized)
+
+3. REPORTING FEATURES
+--------------------
+Report Types:
+- Individual Patient Report
+- Comparative Report (multiple tests for same patient)
+- Department Summary Report
+- Critical Values Report
+
+Report Elements:
+- Patient demographics
+- Test results with normal ranges
+- Graphical trend analysis
+- Interpretation comments
+- Technician information
+- Review status
+
+4. MENU INTEGRATION
+------------------
+Main Menu Additions:
+- Hematology > CBC Test Entry
+- Reports > CBC Reports
+- Administration > CBC Normal Ranges
+
+Navigation Features:
+- Breadcrumb navigation
+- Quick access toolbar
+- Recent tests list
+- Favorites/pinned patients
+
+5. USER EXPERIENCE ENHANCEMENTS
+-----------------------------
+- Keyboard shortcuts for common actions
+- Auto-save draft functionality
+- Data entry templates for common scenarios
+- Context-sensitive help
+- Responsive design for different screen sizes
+- Dark mode option

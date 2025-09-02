@@ -1,0 +1,18 @@
+﻿AForge.NET Installation Instructions:
+
+1. Visit the official AForge.NET GitHub repository:
+   https://github.com/andrewkirillov/AForge.NET
+
+2. Download the latest release or clone the repository
+
+3. Build the solution or extract the pre-built binaries
+
+4. Copy these files to your application directory:
+   - AForge.dll
+   - AForge.Video.dll
+   - AForge.Video.DirectShow.dll
+
+5. Alternatively, you can install via NuGet Package Manager:
+   - Install-Package AForge.Video.DirectShow -Version 2.2.5
+
+6. Make sure all DLLs are placed in the same directory as Sky_CASA.exe
