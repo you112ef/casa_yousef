@@ -10,10 +10,16 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Sky CASA API", version="1.0.0")
 
+origins = settings.cors_origins_list
+allow_credentials = True
+if "*" in origins:
+    origins = ["*"]
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
