@@ -23,7 +23,7 @@ services:
     env: node
     plan: free
     rootDir: web-frontend
-    buildCommand: npm install --no-audit --no-fund && npm run build
+    buildCommand: npm install --legacy-peer-deps --no-audit --no-fund && npm run build
     startCommand: node server.cjs
     envVars:
       - key: VITE_API_BASE_URL
