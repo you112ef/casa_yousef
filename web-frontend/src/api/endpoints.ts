@@ -4,7 +4,7 @@ import { z } from "zod";
 export const LoginDto = z.object({ username: z.string().min(1), password: z.string().min(1) });
 export type LoginDto = z.infer<typeof LoginDto>;
 
-export const User = z.object({ id: z.union([z.string(), z.number()]).transform(String), name: z.string().optional(), email: z.string().email().optional(), role: z.string().optional() });
+export const User = z.object({ id: z.union([z.string(), z.number()]).transform(String), name: z.string().nullish(), email: z.string().email().nullish(), role: z.string().nullish() });
 export type User = z.infer<typeof User>;
 
 export const AuthResponse = z.object({ token: z.string(), user: User.optional() });
@@ -12,15 +12,24 @@ export type AuthResponse = z.infer<typeof AuthResponse>;
 
 export async function login(dto: LoginDto) {
   const { data } = await api.post("/auth/login", dto);
-  const parsed = AuthResponse.parse(data);
-  localStorage.setItem("token", parsed.token);
-  if (parsed.user) localStorage.setItem("user", JSON.stringify(parsed.user));
-  return parsed;
+  const res = AuthResponse.safeParse(data);
+  if (!res.success) {
+    const token = (data as any)?.token as string | undefined;
+    if (!token) throw new Error("Invalid login response");
+    localStorage.setItem("token", token);
+    const user = (data as any)?.user ?? null;
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    return { token, user } as AuthResponse;
+  }
+  localStorage.setItem("token", res.data.token);
+  if (res.data.user) localStorage.setItem("user", JSON.stringify(res.data.user));
+  return res.data;
 }
 
 export async function me() {
   const { data } = await api.get("/auth/me");
-  return User.parse(data);
+  const res = User.safeParse(data);
+  return res.success ? res.data : (data as any);
 }
 
 export const Patient = z.object({
