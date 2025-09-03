@@ -18,7 +18,7 @@ services:
       - key: YOLO_MODEL_PATH
         value: "/opt/render/project/src/ai_sperm_onnx/models/yolov5s.onnx"
 
-  - type: static
+  - type: static_site
     name: sky-casa-frontend
     rootDir: web-frontend
     buildCommand: npm ci && npm run build
