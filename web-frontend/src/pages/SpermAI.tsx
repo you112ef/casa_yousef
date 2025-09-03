@@ -29,12 +29,12 @@ export default function SpermAI() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-2">
           <div className="text-sm font-medium">{t("uploadImage")}</div>
-          <FileDropzone accept="image/*" onFile={setImage} />
+          <FileDropzone accept="image/*" capture="environment" onFile={setImage} />
           <Button className="bg-teal-600 hover:bg-teal-700" onClick={runImage} disabled={!image || loading}>{t("analyze")}</Button>
         </div>
         <div className="space-y-2">
           <div className="text-sm font-medium">{t("uploadVideo")}</div>
-          <FileDropzone accept="video/*" onFile={setVideo} />
+          <FileDropzone accept="video/*" capture="environment" onFile={setVideo} />
           <div className="flex items-center gap-2">
             <label className="text-sm">{t("duration")}</label>
             <Input type="number" className="w-28" value={duration} onChange={(e) => setDuration(Number(e.target.value || 0))} />

@@ -21,10 +21,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) return;
       try {
         const u = await me();
-        setUser(u);
+        setUser(u as any);
       } catch {
-        localStorage.removeItem("token");
-        setToken(null);
+        const cached = localStorage.getItem("user");
+        if (cached) setUser(JSON.parse(cached));
+        // Keep token; backend may be waking up or missing /auth/me
       }
     };
     init();

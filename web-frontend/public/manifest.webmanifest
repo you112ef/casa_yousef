@@ -1,0 +1,11 @@
+{
+  "name": "Sky CASA Web",
+  "short_name": "Sky CASA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "/vite.svg", "sizes": "192x192", "type": "image/svg+xml" }
+  ]
+}
