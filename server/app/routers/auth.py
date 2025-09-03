@@ -4,6 +4,7 @@ from app.db import get_db
 from app import models
 from app.schemas import LoginRequest, TokenResponse, UserOut
 from app.core.security import verify_password, create_access_token
+from app.deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -16,6 +17,5 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     return TokenResponse(token=token, user=UserOut.model_validate(user))
 
 @router.get("/me", response_model=UserOut)
-def me(current_user: models.User = Depends()):
-    # The dependency is injected from app.main via app.dependency_overrides
+def me(current_user: models.User = Depends(get_current_user)):
     return UserOut.model_validate(current_user)
