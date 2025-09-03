@@ -18,15 +18,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Seed admin user
+# Seed / normalize admin user password (pbkdf2)
 @app.on_event("startup")
 def seed_admin():
     db = next(get_db())
-    if not db.query(models.User).filter(models.User.username == "admin").first():
+    admin = db.query(models.User).filter(models.User.username == "admin").first()
+    if not admin:
         u = models.User(username="admin", password_hash=hash_password("admin123"), role="admin", name="Administrator")
         db.add(u)
         db.commit()
         print("Seeded default admin user: admin/admin123")
+    else:
+        # Ensure pbkdf2 hash
+        if not (admin.password_hash or "").startswith("$pbkdf2-sha256$"):
+            admin.password_hash = hash_password("admin123")
+            db.add(admin)
+            db.commit()
+            print("Normalized admin password hash to pbkdf2 (admin/admin123)")
 
 @app.get("/")
 def root():
