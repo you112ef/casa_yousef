@@ -1,7 +1,7 @@
 ; Inno Setup script for Sky CASA
 #define MyAppName "Sky CASA"
 #define MyAppVersion "3.0"
-#define MyAppPublisher "Sky CASA Project"
+#define MyAppPublisher "Yousef Shtiwi | يوسف شتيوي"
 #define MyAppExeName "Sky_CASA.exe"
 
 ; BuildDir is passed from CI. Fallback to local bin path.
@@ -37,8 +37,11 @@ Source: "{#BuildDir}\\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; AI analysis scripts (if present in repo next to build dir)
 Source: "ai_sperm_analysis\\*"; DestDir: "{app}\\ai_sperm_analysis"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
-; Config and database if present
-Source: "database.db"; DestDir: "{app}"; Flags: onlyifdoesntexist ignoreversion skipifsourcedoesntexist
+; OFFLINE ONNX shim + models
+Source: "ai_sperm_onnx\\python.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "ai_sperm_onnx\\models\\*"; DestDir: "{app}\\ai_sperm_onnx\\models"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+; Config (database will be auto-created on first run)
+; Source: "database.db"; DestDir: "{app}"; Flags: onlyifdoesntexist ignoreversion skipifsourcedoesntexist
 Source: "Sky_CASA.exe.config"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]

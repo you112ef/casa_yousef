@@ -445,42 +445,14 @@ namespace SkyCASA
         {
             try
             {
-                var pythonScript = Path.Combine(Application.StartupPath, "ai_sperm_analysis", "analyze_media.py");
-                var arguments = $"\"{pythonScript}\" --type {analysisType} --media \"{mediaPath}\" --patient {currentPatientId}";
-                
-                if (analysisType == "video" && duration > 0)
-                    arguments += $" --duration {duration}";
-                
-                var startInfo = new ProcessStartInfo
+                var run = await AiRunner.RunAsync(analysisType, mediaPath, currentPatientId, duration);
+                if (run.ExitCode == 0 && !string.IsNullOrWhiteSpace(run.StdOut))
                 {
-                    FileName = "python",
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.Combine(Application.StartupPath, "ai_sperm_analysis")
-                };
-                
-                using (var process = Process.Start(startInfo))
-                {
-                    var output = await process.StandardOutput.ReadToEndAsync();
-                    var error = await process.StandardError.ReadToEndAsync();
-                    
-                    await Task.Run(() => process.WaitForExit());
-                    
-                    if (process.ExitCode == 0 && !string.IsNullOrEmpty(output))
-                    {
-                        // Parse JSON result
-                        var serializer = new JavaScriptSerializer();
-                        var result = serializer.Deserialize<SpermAnalysisResult>(output);
-                        return result;
-                    }
-                    else
-                    {
-                        throw new Exception($"Python analysis failed: {error}");
-                    }
+                    var serializer = new JavaScriptSerializer();
+                    var result = serializer.Deserialize<SpermAnalysisResult>(run.StdOut);
+                    return result;
                 }
+                throw new Exception(string.IsNullOrWhiteSpace(run.StdErr) ? "Unknown AI error" : run.StdErr);
             }
             catch (Exception ex)
             {

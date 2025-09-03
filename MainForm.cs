@@ -43,6 +43,7 @@ namespace SkyCASA
         // Status components
         private ToolStripStatusLabel statusLabel;
         private ToolStripProgressBar progressBar;
+        private ToolStripStatusLabel developerLabel;
         private ToolStripStatusLabel timeLabel;
         
         // Color scheme - Enhanced Medical Theme
@@ -208,10 +209,13 @@ namespace SkyCASA
             progressBar = new ToolStripProgressBar();
             progressBar.Visible = false;
             
+            developerLabel = new ToolStripStatusLabel("المطور: يوسف شتيوي");
+            developerLabel.TextAlign = ContentAlignment.MiddleRight;
+            
             timeLabel = new ToolStripStatusLabel();
             timeLabel.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
             
-            statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, progressBar, timeLabel });
+            statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel, progressBar, developerLabel, timeLabel });
         }
         
         private void CreateMainPanel()
@@ -725,6 +729,7 @@ namespace SkyCASA
 • Python Integration
 • Crystal Reports
 
+المطور | Developer: يوسف شتيوي
 © 2025 - تم تطويره خصيصاً لمختبرات التحاليل الطبية";
             
             MessageBox.Show(about, "حول البرنامج | About Sky CASA", MessageBoxButtons.OK, MessageBoxIcon.Information);

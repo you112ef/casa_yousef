@@ -1,0 +1,88 @@
+name: Build and Package CASA ONNX AI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - scout/ui-blood-tests-and-onnx-shim
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore SkyCASA.sln
+
+      - name: Build solution (Release)
+        run: |
+          msbuild SkyCASA.sln /t:Rebuild /p:Configuration=Release /m
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build Installer
+        run: |
+          iscc installer/sky-casa.iss
+        shell: powershell
+
+      - name: Locate installer
+        id: find
+        shell: powershell
+        run: |
+          $file = Get-ChildItem -Recurse -Filter "Sky-CASA-Setup*.exe" | Select-Object -First 1
+          echo "file=$($file.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CASA-ONNX-AI-Installer
+          path: ${{ steps.find.outputs.file }}
+
+  smoke-test:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: CASA-ONNX-AI-Installer
+          path: dist
+
+      - name: Install silently
+        shell: powershell
+        run: |
+          $setup = Get-ChildItem dist/*.exe | Select-Object -First 1
+          & $setup.FullName /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /DIR="C:\\Program Files\\CASA ONNX AI" /LOG=install.log
+          Get-Content install.log -Tail 50
+
+      - name: Create dummy image and run AI shim
+        shell: powershell
+        run: |
+          $app = "C:\\Program Files\\CASA ONNX AI"
+          $img = "$env:TEMP\\dummy.png"
+          Add-Type -AssemblyName System.Drawing
+          $bmp = New-Object System.Drawing.Bitmap 640,640
+          $g = [System.Drawing.Graphics]::FromImage($bmp)
+          $g.Clear([System.Drawing.Color]::FromArgb(255, 240, 240, 240))
+          $g.Dispose(); $bmp.Save($img, [System.Drawing.Imaging.ImageFormat]::Png); $bmp.Dispose()
+          $exe = Join-Path $app "python.exe"
+          if (!(Test-Path $exe)) { $exe = "python" }
+          $args = "dummy.py --type image --media `"$img`" --patient 1"
+          $p = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -PassThru -RedirectStandardOutput stdout.txt -RedirectStandardError stderr.txt
+          $p.WaitForExit()
+          Write-Host "ExitCode=$($p.ExitCode)"; Get-Content stdout.txt; Get-Content stderr.txt
+          if ($p.ExitCode -ne 0) { throw "AI shim failed" }
+
+      - name: Uninstall silently
+        if: always()
+        shell: powershell
+        run: |
+          $unins = Get-ChildItem "C:\\Program Files\\CASA ONNX AI" -Filter unins*.exe -Recurse | Select-Object -First 1
+          if ($unins) { & $unins.FullName /VERYSILENT /SUPPRESSMSGBOXES }
