@@ -18,15 +18,13 @@ services:
       - key: YOLO_MODEL_PATH
         value: "/opt/render/project/src/ai_sperm_onnx/models/yolov5s.onnx"
 
-  - type: static_site
+  - type: web
     name: sky-casa-frontend
+    env: node
+    plan: free
     rootDir: web-frontend
     buildCommand: npm ci && npm run build
-    publishPath: dist
+    startCommand: npx serve -s dist -l $PORT
     envVars:
       - key: VITE_API_BASE_URL
         value: https://sky-casa-backend.onrender.com/api/v1
-    routes:
-      - type: rewrite
-        source: /.*
-        destination: /index.html
