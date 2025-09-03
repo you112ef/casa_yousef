@@ -15,7 +15,10 @@ async def analyze_image(file: UploadFile = File(...)):
         tmp.write(content)
         tmp_path = tmp.name
     try:
-        res = analyzer.analyze_image(tmp_path)
+        try:
+            res = analyzer.analyze_image(tmp_path)
+        except Exception as e:
+            res = {"status": "error", "note": "AI engine failed", "error": str(e)}
         return JSONResponse(res)
     finally:
         try:
@@ -30,7 +33,10 @@ async def analyze_video(file: UploadFile = File(...), durationSec: int | None = 
         tmp.write(content)
         tmp_path = tmp.name
     try:
-        res = analyzer.analyze_video(tmp_path, durationSec)
+        try:
+            res = analyzer.analyze_video(tmp_path, durationSec)
+        except Exception as e:
+            res = {"status": "error", "note": "AI engine failed", "error": str(e)}
         return JSONResponse(res)
     finally:
         try:
