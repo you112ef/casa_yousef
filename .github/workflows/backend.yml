@@ -1,0 +1,43 @@
+name: Build and Publish Backend Docker Image
+
+on:
+  push:
+    branches: [ scout/sco-1-d886e992 ]
+    paths:
+      - 'server/**'
+      - '.github/workflows/backend.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/casa_yousef-backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        run: |
+          docker build -t $IMAGE_NAME:${{ github.sha }} -f server/Dockerfile .
+      - name: Push image
+        run: |
+          docker push $IMAGE_NAME:${{ github.sha }}
+      - name: Tag latest (optional)
+        if: github.ref == 'refs/heads/scout/sco-1-d886e992'
+        run: |
+          docker tag $IMAGE_NAME:${{ github.sha }} $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:latest
+      - name: Optional Render deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
+        run: |
+          curl -X POST "$RENDER_DEPLOY_HOOK"
