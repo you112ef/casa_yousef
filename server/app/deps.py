@@ -1,5 +1,5 @@
-from fastapi import Depends, HTTPException, status
-from jose import jwt, JWTError
+from fastapi import Depends, HTTPException, status, Header
+from jose import jwt
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db import get_db
@@ -7,7 +7,8 @@ from app import models
 
 ALGORITHM = "HS256"
 
-def get_current_user(db: Session = Depends(get_db), authorization: str | None = None) -> models.User:
+
+def get_current_user(authorization: str | None = Header(None), db: Session = Depends(get_db)) -> models.User:
     if not authorization:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     try:
