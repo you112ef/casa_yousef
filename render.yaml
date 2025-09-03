@@ -16,4 +16,4 @@ services:
       - key: CORS_ORIGINS
         value: "*"
       - key: YOLO_MODEL_PATH
-        value: "./ai_sperm_onnx/models/yolov5s.onnx"
+        value: "/opt/render/project/src/ai_sperm_onnx/models/yolov5s.onnx"
