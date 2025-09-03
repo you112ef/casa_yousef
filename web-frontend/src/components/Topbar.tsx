@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { LogOut, Languages, User2 } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider";
+import { Link } from "react-router-dom";
 
 export default function Topbar() {
   const { t, i18n } = useTranslation();
@@ -20,12 +21,12 @@ export default function Topbar() {
           <span className="text-lg font-semibold">Sky CASA</span>
         </div>
         <nav className="hidden items-center gap-4 md:flex">
-          <a className="text-sm opacity-90 hover:opacity-100" href="/">{t("dashboard")}</a>
-          <a className="text-sm opacity-90 hover:opacity-100" href="/data">{t("dataView")}</a>
-          <a className="text-sm opacity-90 hover:opacity-100" href="/analysis">{t("analysis")}</a>
-          <a className="text-sm opacity-90 hover:opacity-100" href="/ai">{t("ai")}</a>
-          <a className="text-sm opacity-90 hover:opacity-100" href="/who-report">{t("whoReport")}</a>
-          <a className="text-sm opacity-90 hover:opacity-100" href="/settings">{t("settings")}</a>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/">{t("dashboard")}</Link>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/data">{t("dataView")}</Link>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/analysis">{t("analysis")}</Link>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/ai">{t("ai")}</Link>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/who-report">{t("whoReport")}</Link>
+          <Link className="text-sm opacity-90 hover:opacity-100" to="/settings">{t("settings")}</Link>
         </nav>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={toggleLang} className="bg-white/20 text-white hover:bg-white/30">
