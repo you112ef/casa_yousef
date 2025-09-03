@@ -5,7 +5,6 @@ class SpermAnalyzerService:
     def __init__(self, model_path: str | None = None) -> None:
         self.model_path = model_path
         self._ort_session = None
-        # Try ONNXRuntime first (lightweight for hosting)
         try:
             import onnxruntime as ort  # type: ignore
             if model_path and os.path.exists(model_path):
@@ -13,7 +12,6 @@ class SpermAnalyzerService:
         except Exception:
             self._ort_session = None
 
-        # Fallback to ultralytics if available
         self._yolo = None
         if self._ort_session is None:
             try:
@@ -23,17 +21,13 @@ class SpermAnalyzerService:
                 self._yolo = None
 
     def _preprocess(self, path: str):
-        import cv2
         import numpy as np
-        img = cv2.imread(path)
-        if img is None:
-            raise RuntimeError("Failed to read image")
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # Resize to 640x640 without letterbox (simple)
-        img_resized = cv2.resize(img, (640, 640))
-        x = img_resized.astype("float32") / 255.0
+        from PIL import Image
+        img = Image.open(path).convert("RGB")
+        img_resized = img.resize((640, 640))
+        x = np.asarray(img_resized).astype("float32") / 255.0
         x = x.transpose(2, 0, 1)[None, ...]
-        return img, img_resized, x
+        return np.asarray(img), np.asarray(img_resized), x
 
     def _nms(self, boxes: List[Tuple[float, float, float, float]], scores: List[float], iou_thresh: float = 0.45):
         # Simple NMS
