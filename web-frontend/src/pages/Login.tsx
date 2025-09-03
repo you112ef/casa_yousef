@@ -11,14 +11,17 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const normalizeDigits = (s: string) => s.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d).toString());
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
-      await login(username, password);
+      const u = username.trim();
+      const p = normalizeDigits(password);
+      await login(u, p);
       location.href = "/";
     } catch (e: any) {
-      setError(e?.response?.data?.error || "Login failed");
+      setError(e?.response?.data?.detail || e?.response?.data?.error || e?.message || "Login failed");
     }
   };
 
