@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sky-casa-backend
+    env: python
+    plan: free
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////opt/render/project/src/sky_casa_web.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE_MINUTES
+        value: "4320"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: YOLO_MODEL_PATH
+        value: "./ai_sperm_onnx/models/yolov5s.onnx"
