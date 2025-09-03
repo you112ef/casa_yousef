@@ -3,7 +3,6 @@ name: Trigger Render Auto Deploy
 on:
   push:
     branches:
-      - master
       - scout/sco-1-d886e992
   workflow_dispatch:
 
