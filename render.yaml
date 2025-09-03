@@ -24,7 +24,7 @@ services:
     plan: free
     rootDir: web-frontend
     buildCommand: npm install --no-audit --no-fund && npm run build
-    startCommand: node server.js
+    startCommand: node server.cjs
     envVars:
       - key: VITE_API_BASE_URL
         value: https://sky-casa-backend.onrender.com/api/v1
