@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
@@ -6,7 +6,7 @@ class UserOut(BaseModel):
     id: int
     username: str
     name: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     role: Optional[str] = None
 
     class Config:
@@ -26,7 +26,7 @@ class PatientBase(BaseModel):
     dateOfBirth: Optional[str] = None
     gender: Optional[str] = None
     phoneNumber: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     address: Optional[str] = None
 
 class PatientCreate(PatientBase):
