@@ -19,3 +19,9 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def me(current_user: models.User = Depends(get_current_user)):
     return UserOut.model_validate(current_user)
+
+# Debug endpoint (safe to keep; returns only header presence)
+from fastapi import Header
+@router.get("/echo")
+def echo_auth(authorization: str | None = Header(None)):
+    return {"authorization": authorization if authorization else None}
