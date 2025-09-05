@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  backend:
+    build: ./server
+    container_name: skycasa-backend
+    ports:
+      - "8000:8000"
+  frontend:
+    build:
+      context: .
+      dockerfile: web-frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8000/api/v1
+    container_name: skycasa-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
